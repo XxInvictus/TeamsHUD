@@ -136,13 +136,13 @@ public class ModTeam extends net.minecraft.world.scores.Team {
 
     private void addPlayer(UUID player) {
         players.add(player);
+        var playerEntity = teamDB.serverLevel.getServer().getPlayerList().getPlayer(player);
         String playerName = getNameFromUUID(player);
         // Scoreboard
         var playerScoreboardTeam = teamDB.scoreboard.getPlayersTeam(playerName);
         if (playerScoreboardTeam == null || !playerScoreboardTeam.isAlliedTo(scoreboardTeam)) {
             teamDB.scoreboard.addPlayerToTeam(playerName, scoreboardTeam);
         }
-        var playerEntity = teamDB.serverLevel.getServer().getPlayerList().getPlayer(player);
         if (playerEntity != null) {
             // Packets
             Services.PLATFORM.sendToClient(new S2CTeamUpdatePacket(name, playerName, S2CTeamUpdatePacket.Action.JOINED, true), playerEntity);
@@ -163,6 +163,7 @@ public class ModTeam extends net.minecraft.world.scores.Team {
 
     private void removePlayer(UUID player) {
         players.remove(player);
+        var playerEntity = teamDB.serverLevel.getServer().getPlayerList().getPlayer(player);
         String playerName = getNameFromUUID(player);
         // Scoreboard
         var playerScoreboardTeam = teamDB.scoreboard.getPlayersTeam(playerName);
@@ -170,7 +171,6 @@ public class ModTeam extends net.minecraft.world.scores.Team {
             teamDB.scoreboard.removePlayerFromTeam(playerName, scoreboardTeam);
         }
         // Packets
-        var playerEntity = teamDB.serverLevel.getServer().getPlayerList().getPlayer(player);
         if (playerEntity != null) {
             playerOffline(playerEntity, true);
             Services.PLATFORM.sendToClient(new S2CTeamClearPacket(), playerEntity);
