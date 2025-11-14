@@ -18,6 +18,18 @@ out
 build
 .gradle
 
+# vscode
+.vscode/
+
+# OS specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# logs
+*.log
+logs/
+
 # other
 eclipse
 run
