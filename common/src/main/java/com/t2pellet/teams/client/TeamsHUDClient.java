@@ -94,7 +94,15 @@ public class TeamsHUDClient {
 
     public static void handleTeamPlayerDataPacket(CompoundTag tag) {
         UUID uuid = tag.getUUID(S2CTeamPlayerDataPacket.ID_KEY);
-        switch (S2CTeamPlayerDataPacket.Type.valueOf(tag.getString(S2CTeamPlayerDataPacket.TYPE_KEY))) {
+        S2CTeamPlayerDataPacket.Type type;
+        try {
+            type = S2CTeamPlayerDataPacket.Type.valueOf(tag.getString(S2CTeamPlayerDataPacket.TYPE_KEY));
+        } catch (IllegalArgumentException e) {
+            TeamsHUD.LOGGER.error("Invalid player data packet type: {}", tag.getString(S2CTeamPlayerDataPacket.TYPE_KEY));
+            return;
+        }
+        
+        switch (type) {
             case ADD -> {
                 if (ClientTeam.INSTANCE.hasPlayer(uuid)) return;
 
@@ -109,8 +117,8 @@ public class TeamsHUDClient {
                 if (!skinVal.isEmpty()) {
                     GameProfile dummy = new GameProfile(UUID.randomUUID(), "");
                     dummy.getProperties().put("textures", new Property("textures", skinVal, skinSig));
-                    Minecraft.getInstance().getSkinManager().registerSkins(dummy, (type, id, texture) -> {
-                        if (type == MinecraftProfileTexture.Type.SKIN) {
+                    Minecraft.getInstance().getSkinManager().registerSkins(dummy, (type1, id, texture) -> {
+                        if (type1 == MinecraftProfileTexture.Type.SKIN) {
                             ClientTeam.INSTANCE.addPlayer(uuid, name, id, health, hunger);
                         }
                     }, false);

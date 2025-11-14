@@ -48,6 +48,9 @@ public class S2CTeamPlayerDataPacket implements S2CModPacket {
                 tag.putFloat(HEALTH_KEY, health);
                 tag.putInt(HUNGER_KEY, hunger);
             }
+            case REMOVE -> {
+                // No additional data needed for REMOVE
+            }
         }
     }
 
