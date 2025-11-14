@@ -1,25 +1,118 @@
-# MultiLoader Template
+# TeamsHUD
 
-This project provides a Gradle project template that can compile mods for both Forge and Fabric using a common sourceset. This project does not require any third party libraries or dependencies. If you have any questions or want to discuss the project join our [Discord](https://discord.myceliummod.network).
+A Minecraft mod that adds team management functionality with visual HUD elements for both Forge and Fabric mod loaders.
 
-## Getting Started
+## Features
 
-## IntelliJ IDEA
-This guide will show how to import the MultiLoader Template into IntelliJ IDEA. The setup process is roughly equivalent to setting up Forge and Fabric independently and should be very familiar to anyone who has worked with their MDKs.
+### Team Management
+- **Create and manage teams**: Form teams with other players
+- **Player invitations**: Send and accept team invitations via toast notifications
+- **Join requests**: Request to join existing teams
+- **Team permissions**: Designate team leaders with management permissions
+- **Player kicking**: Remove players from teams (requires permissions)
 
-1. Clone or download this repository to your computer.
-2. Configure the project by editing the `group`, `mod_name`, `mod_author`, and `mod_id` properties in the `gradle.properties` file. You will also need to change the `rootProject.name`  property in `settings.gradle`, this should match the folder name of your project, or else IDEA may complain.
-3. Open the template's root folder as a new project in IDEA. This is the folder that contains this README file and the gradlew executable.
-4. If your default JVM/JDK is not Java 17 you will encounter an error when opening the project. This error is fixed by going to `File > Settings > Build, Execution, Deployment > Build Tools > Gradle > Gradle JVM`and changing the value to a valid Java 17 JVM. You will also need to set the Project SDK to Java 17. This can be done by going to `File > Project Structure > Project SDK`. Once both have been set open the Gradle tab in IDEA and click the refresh button to reload the project.
-5. Open the Gradle tab in IDEA if it has not already been opened. Navigate to `Your Project > Common > Tasks > vanilla gradle > decompile`. Run this task to decompile Minecraft.
-6. Open the Gradle tab in IDEA if it has not already been opened. Navigate to `Your Project > Forge > Tasks > forgegradle runs > genIntellijRuns`. Run this task to set up run configurations for Forge.
-7. Open your Run/Debug Configurations. Under the Application category there should now be options to run Forge and Fabric projects. Select one of the client options and try to run it.
-8. Assuming you were able to run the game in step 7 your workspace should now be set up.
+### HUD Elements
+- **Compass HUD**: Visual compass showing teammate locations and distances
+- **Status HUD**: Display teammate health and hunger levels in real-time
+- **Configurable detection distance**: Customize how far teammates can be detected
+- **Toggle visibility**: Enable/disable HUD elements on the fly
 
-### Eclipse
-While it is possible to use this template in Eclipse it is not recommended. During the development of this template multiple critical bugs and quirks related to Eclipse were found at nearly every level of the required build tools. While we continue to work with these tools to report and resolve issues support for projects like these are not there yet. For now Eclipse is considered unsupported by this project. The development cycle for build tools is notoriously slow so there are no ETAs available.
+### Keybindings
+- **Accept** (Right Bracket `]`): Accept team invitations or join requests
+- **Reject** (Left Bracket `[`): Reject team invitations or join requests  
+- **Toggle HUD** (B): Toggle compass and status HUD visibility
 
-## Development Guide
-When using this template the majority of your mod is developed in the Common project. The Common project is compiled against the vanilla game and is used to hold code that is shared between the different loader-specific versions of your mod. The Common project has no knowledge or access to ModLoader specific code, apis, or concepts. Code that requires something from a specific loader must be done through the project that is specific to that loader, such as the Forge or Fabric project.
+### Configuration Options
+- Show invisible teammates
+- Name tag visibility settings
+- Death message visibility settings
+- Collision rules
+- Compass HUD enable/disable
+- Status HUD enable/disable
+- Compass detection distance
 
-Loader specific projects such as the Forge and Fabric project are used to load the Common project into the game. These projects also define code that is specific to that loader. Loader specific projects can access all of the code in the Common project. It is important to remember that the Common project can not access code from loader specific projects.
+## Installation
+
+### Prerequisites
+- Minecraft 1.20.1
+- Java 17 or higher
+- **Forge**: Version 47.1.3 or higher
+- **Fabric**: Fabric Loader 0.15.0+ and Fabric API 0.90.0+
+
+### Steps
+1. Download the appropriate version for your mod loader (Forge or Fabric)
+2. Place the downloaded JAR file in your Minecraft `mods` folder
+3. Launch Minecraft with the corresponding mod loader
+4. Configure keybindings and settings in the game options menu
+
+## Usage
+
+### Creating a Team
+1. Open the teams screen using the mod's interface
+2. Create a new team with a custom name
+3. Invite players by username
+
+### Joining a Team
+1. Receive a team invitation via toast notification
+2. Press the **Accept** key (Right Bracket) to join
+3. Or press the **Reject** key (Left Bracket) to decline
+
+### Managing Team Members
+- Team leaders can invite new members
+- Team leaders can kick members
+- Players can leave teams at any time
+
+### Using the HUD
+- The compass HUD shows directional indicators to teammates
+- The status HUD displays real-time health and hunger information
+- Press **Toggle HUD** (B) to show/hide HUD elements
+- Configure detection distance and visibility in mod settings
+
+## Building from Source
+
+This project uses a MultiLoader template supporting both Forge and Fabric.
+
+### IntelliJ IDEA
+1. Clone this repository
+2. Import as a Gradle project in IntelliJ IDEA
+3. Set Project SDK to Java 17
+4. Navigate to Gradle panel > Common > Tasks > vanilla gradle > decompile
+5. Navigate to Gradle panel > Forge > Tasks > forgegradle runs > genIntellijRuns
+6. Run configurations for both Forge and Fabric will be available
+
+### Build Commands
+```bash
+# Build all versions
+./gradlew build
+
+# Build Forge only
+./gradlew :forge:build
+
+# Build Fabric only
+./gradlew :fabric:build
+
+# Run checks and tests
+./gradlew check
+```
+
+Built JARs will be located in:
+- Forge: `forge/build/libs/`
+- Fabric: `fabric/build/libs/`
+
+## License
+
+This project is licensed under the C0-1.0 License.
+
+## Authors
+
+- Tfarcenim
+- CommodoreThrawn
+
+## Development
+
+The mod uses a common sourceset architecture:
+- **Common**: Shared code compiled against vanilla Minecraft
+- **Forge**: Forge-specific implementations
+- **Fabric**: Fabric-specific implementations
+
+Network packets handle client-server synchronization for team data and player updates.
