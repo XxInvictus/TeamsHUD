@@ -22,8 +22,6 @@ import net.minecraft.world.scores.Scoreboard;
 import java.util.*;
 import java.util.stream.Stream;
 
-;
-
 public class ModTeam extends net.minecraft.world.scores.Team {
 
     public final String name;
