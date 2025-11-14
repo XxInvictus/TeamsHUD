@@ -84,7 +84,7 @@ class ClientTeamImpl implements ClientTeam {
             teammate.health = health;
             teammate.hunger = hunger;
         } else {
-            TeamsHUD.LOGGER.warn("Tried updating player with UUID " + player + "but they are not in this clients team");
+            TeamsHUD.LOGGER.warn("Tried updating player with UUID {} but they are not in this client's team", player);
         }
     }
 
