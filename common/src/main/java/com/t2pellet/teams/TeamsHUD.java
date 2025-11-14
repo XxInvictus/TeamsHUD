@@ -63,6 +63,7 @@ public class TeamsHUD {
         if (team != null) {
             team.playerOffline(player, true);
         }
+        teamDB.setDirty();
     }
 
     public static void playerClone(ServerPlayer oldPlayer,ServerPlayer newPlayer,boolean alive) {
