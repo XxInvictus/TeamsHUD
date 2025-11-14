@@ -193,11 +193,28 @@ public class ModTeam extends net.minecraft.world.scores.Team {
     }
 
     static ModTeam fromNBT(CompoundTag compound, TeamDB teamDB) {
+        ChatFormatting color = ChatFormatting.getByName(compound.getString("colour"));
+        if (color == null) {
+            color = ChatFormatting.WHITE;
+        }
+        CollisionRule collisionRule = CollisionRule.byName(compound.getString("collision"));
+        if (collisionRule == null) {
+            collisionRule = CollisionRule.ALWAYS;
+        }
+        Visibility deathMessages = Visibility.byName(compound.getString("deathMessages"));
+        if (deathMessages == null) {
+            deathMessages = Visibility.ALWAYS;
+        }
+        Visibility nameTags = Visibility.byName(compound.getString("nameTags"));
+        if (nameTags == null) {
+            nameTags = Visibility.ALWAYS;
+        }
+        
         ModTeam team = new Builder(compound.getString("name"))
-                .setColour(ChatFormatting.getByName(compound.getString("colour")))
-                .setCollisionRule(CollisionRule.byName(compound.getString("collision")))
-                .setDeathMessageVisibilityRule(Visibility.byName(compound.getString("deathMessages")))
-                .setNameTagVisibilityRule(Visibility.byName(compound.getString("nameTags")))
+                .setColour(color)
+                .setCollisionRule(collisionRule)
+                .setDeathMessageVisibilityRule(deathMessages)
+                .setNameTagVisibilityRule(nameTags)
                 .setFriendlyFireAllowed(compound.getBoolean("friendlyFire"))
                 .setShowFriendlyInvisibles(compound.getBoolean("showInvisible"))
                 .complete(teamDB);

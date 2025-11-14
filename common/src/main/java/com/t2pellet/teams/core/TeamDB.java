@@ -53,6 +53,9 @@ public class TeamDB extends SavedData {
     }
 
     public ModTeam addTeam(String name, @Nullable ServerPlayer creator) throws ModTeam.TeamException {
+        if (name == null || name.trim().isEmpty()) {
+            throw new ModTeam.TeamException(ModComponents.translatable("teams.error.invalidname"));
+        }
         if (creator != null && ((IHasTeam) creator).hasTeam()) {
             throw new ModTeam.TeamException(ModComponents.translatable("teams.error.alreadyinteam", creator.getName().getString()));
         }
@@ -61,7 +64,7 @@ public class TeamDB extends SavedData {
         if (creator != null) {
             team.addPlayer(creator);
         }
-        List<ServerPlayer> players = creator.getServer().getPlayerList().getPlayers();
+        List<ServerPlayer> players = (creator != null) ? creator.getServer().getPlayerList().getPlayers() : serverLevel.getServer().getPlayerList().getPlayers();
         Services.PLATFORM.sendToClients(new S2CTeamDataPacket(S2CTeamDataPacket.Type.ONLINE, team.name), players);
         setDirty();
         return team;
