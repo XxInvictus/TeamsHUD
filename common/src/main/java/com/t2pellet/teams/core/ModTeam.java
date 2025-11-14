@@ -156,6 +156,7 @@ public class ModTeam extends net.minecraft.world.scores.Team {
                 }
             }
         }
+        teamDB.setDirty();
     }
 
     private void removePlayer(UUID player) {
@@ -175,6 +176,7 @@ public class ModTeam extends net.minecraft.world.scores.Team {
             Services.PLATFORM.sendToClients(new S2CTeamUpdatePacket(name, playerName, S2CTeamUpdatePacket.Action.LEFT, false), getOnlinePlayers());
             ((IHasTeam) playerEntity).setTeam(null);
         }
+        teamDB.setDirty();
     }
 
     private String getNameFromUUID(UUID id) {
@@ -196,7 +198,7 @@ public class ModTeam extends net.minecraft.world.scores.Team {
             team.addPlayer(UUID.fromString(elem.getAsString()));
         }
 
-        ListTag advancements = compound.getList("advancement", Tag.TAG_STRING);
+        ListTag advancements = compound.getList("advancements", Tag.TAG_STRING);
         for (var adv : advancements) {
             ResourceLocation id = ResourceLocation.tryParse(adv.getAsString());
             team.addAdvancement(teamDB.serverLevel.getServer().getAdvancements().getAdvancement(id));
