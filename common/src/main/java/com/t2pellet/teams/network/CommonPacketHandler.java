@@ -1,7 +1,19 @@
 package com.t2pellet.teams.network;
 
-import com.t2pellet.teams.network.client.*;
-import com.t2pellet.teams.network.server.*;
+import com.t2pellet.teams.network.client.S2CTeamClearPacket;
+import com.t2pellet.teams.network.client.S2CTeamDataPacket;
+import com.t2pellet.teams.network.client.S2CTeamInitPacket;
+import com.t2pellet.teams.network.client.S2CTeamInviteSentPacket;
+import com.t2pellet.teams.network.client.S2CTeamInvitedPacket;
+import com.t2pellet.teams.network.client.S2CTeamPlayerDataPacket;
+import com.t2pellet.teams.network.client.S2CTeamRequestedPacket;
+import com.t2pellet.teams.network.client.S2CTeamUpdatePacket;
+import com.t2pellet.teams.network.server.C2STeamCreatePacket;
+import com.t2pellet.teams.network.server.C2STeamInvitePacket;
+import com.t2pellet.teams.network.server.C2STeamJoinPacket;
+import com.t2pellet.teams.network.server.C2STeamKickPacket;
+import com.t2pellet.teams.network.server.C2STeamLeavePacket;
+import com.t2pellet.teams.network.server.C2STeamRequestPacket;
 import com.t2pellet.teams.platform.PhysicalSide;
 import com.t2pellet.teams.platform.Platform;
 import com.t2pellet.teams.platform.Services;

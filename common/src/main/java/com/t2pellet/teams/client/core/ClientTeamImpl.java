@@ -7,7 +7,12 @@ import com.t2pellet.teams.client.ui.menu.TeamsScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 class ClientTeamImpl implements ClientTeam {
 

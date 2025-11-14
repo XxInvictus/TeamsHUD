@@ -3,7 +3,11 @@ package com.t2pellet.teams.core;
 import com.mojang.authlib.GameProfile;
 import com.t2pellet.teams.TeamsHUD;
 import com.t2pellet.teams.mixin.AdvancementAccessor;
-import com.t2pellet.teams.network.client.*;
+import com.t2pellet.teams.network.client.S2CTeamClearPacket;
+import com.t2pellet.teams.network.client.S2CTeamDataPacket;
+import com.t2pellet.teams.network.client.S2CTeamInitPacket;
+import com.t2pellet.teams.network.client.S2CTeamPlayerDataPacket;
+import com.t2pellet.teams.network.client.S2CTeamUpdatePacket;
 import com.t2pellet.teams.platform.Services;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.Advancement;
@@ -19,7 +23,15 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 public class ModTeam extends net.minecraft.world.scores.Team {

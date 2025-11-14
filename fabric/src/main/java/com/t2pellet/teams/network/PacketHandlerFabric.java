@@ -1,6 +1,6 @@
 package com.t2pellet.teams.network;
 
-import com.t2pellet.teams.network.server.*;
+import com.t2pellet.teams.network.server.C2SModPacket;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
 
