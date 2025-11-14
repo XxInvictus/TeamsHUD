@@ -1,6 +1,7 @@
 package com.t2pellet.teams.core;
 
 import com.mojang.authlib.GameProfile;
+import com.t2pellet.teams.TeamsHUD;
 import com.t2pellet.teams.mixin.AdvancementAccessor;
 import com.t2pellet.teams.network.client.*;
 import com.t2pellet.teams.platform.Services;
@@ -203,13 +204,22 @@ public class ModTeam extends net.minecraft.world.scores.Team {
 
         ListTag players = compound.getList("players", Tag.TAG_STRING);
         for (var elem : players) {
-            team.addPlayer(UUID.fromString(elem.getAsString()));
+            try {
+                team.addPlayer(UUID.fromString(elem.getAsString()));
+            } catch (IllegalArgumentException e) {
+                TeamsHUD.LOGGER.error("Failed to parse UUID for team {}: {}", compound.getString("name"), elem.getAsString(), e);
+            }
         }
 
         ListTag advancements = compound.getList("advancements", Tag.TAG_STRING);
         for (var adv : advancements) {
             ResourceLocation id = ResourceLocation.tryParse(adv.getAsString());
-            team.addAdvancement(teamDB.serverLevel.getServer().getAdvancements().getAdvancement(id));
+            if (id != null) {
+                var advancement = teamDB.serverLevel.getServer().getAdvancements().getAdvancement(id);
+                if (advancement != null) {
+                    team.addAdvancement(advancement);
+                }
+            }
         }
 
         return team;
