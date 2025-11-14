@@ -37,10 +37,11 @@ public class C2STeamKickPacket implements C2SModPacket {
             try {
                 TeamDB.getOrMakeDefault(player.server).removePlayerFromTeam(kicked);
             } catch (ModTeam.TeamException ex) {
-                TeamsHUD.LOGGER.error(ex.getMessage());
+                TeamsHUD.LOGGER.error("Failed to kick player {} from team '{}': {}", toKick, name, ex.getMessage(), ex);
             }
         } else {
-            TeamsHUD.LOGGER.error("Received packet to kick player, but the sender did not have permissions");
+            TeamsHUD.LOGGER.error("Player {} attempted to kick {} from team '{}' without permissions", 
+                player != null ? player.getName().getString() : "null", toKick, name);
         }
     }
 }

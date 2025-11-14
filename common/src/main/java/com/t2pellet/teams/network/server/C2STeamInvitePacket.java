@@ -34,12 +34,14 @@ public class C2STeamInvitePacket implements C2SModPacket {
 
         ModTeam team = ((IHasTeam) player).getTeam();
         if (team == null) {
-            TeamsHUD.LOGGER.error("{} tried inviting {} but they are not in a team..", player.getName().getString(), toPlayer.getName().getString());
+            TeamsHUD.LOGGER.error("Player {} tried inviting {} but they are not in a team", 
+                player.getName().getString(), toPlayer.getName().getString());
         } else {
             try {
                 TeamDB.getOrMakeDefault(player.server).invitePlayerToTeam(toPlayer, team);
             } catch (ModTeam.TeamException e) {
-                TeamsHUD.LOGGER.error(e.getMessage());
+                TeamsHUD.LOGGER.error("Failed to invite player {} to team '{}': {}", 
+                    toPlayer.getName().getString(), team.getName(), e.getMessage(), e);
             }
         }
     }

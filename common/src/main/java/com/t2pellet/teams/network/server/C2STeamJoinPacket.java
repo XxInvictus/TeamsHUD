@@ -27,8 +27,8 @@ public class C2STeamJoinPacket implements C2SModPacket {
         try {
             TeamDB.getOrMakeDefault(player.server).addPlayerToTeam(player, team);
         } catch (ModTeam.TeamException ex) {
-            TeamsHUD.LOGGER.error("Failed to join team: {}", team);
-            TeamsHUD.LOGGER.error(ex.getMessage());
+            TeamsHUD.LOGGER.error("Failed to add player {} to team '{}': {}", 
+                player.getName().getString(), this.team, ex.getMessage(), ex);
         }
     }
 }

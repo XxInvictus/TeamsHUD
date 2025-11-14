@@ -25,7 +25,7 @@ public class C2STeamLeavePacket implements C2SModPacket {
         try {
             TeamDB.getOrMakeDefault(player.server).removePlayerFromTeam(player);
         } catch (ModTeam.TeamException ex) {
-            TeamsHUD.LOGGER.error(ex.getMessage());
+            TeamsHUD.LOGGER.error("Failed to remove player {} from team: {}", player.getName().getString(), ex.getMessage(), ex);
         }
     }
 }

@@ -27,7 +27,7 @@ public class C2STeamCreatePacket implements C2SModPacket {
         try {
             TeamDB.getOrMakeDefault(player.server).addTeam(team, player);
         } catch (Exception e) {
-            TeamsHUD.LOGGER.error(e.getMessage());
+            TeamsHUD.LOGGER.error("Failed to create team '{}' for player {}: {}", team, player.getName().getString(), e.getMessage(), e);
         }
     }
 }
