@@ -38,8 +38,8 @@ public class ModTeam extends net.minecraft.world.scores.Team {
 
     public final String name;
     private final TeamDB teamDB;
-    private Set<UUID> players;
-    private Map<UUID, ServerPlayer> onlinePlayers;
+    private final Set<UUID> players;
+    private final Map<UUID, ServerPlayer> onlinePlayers;
     private final Set<Advancement> advancements = new LinkedHashSet<>();
     private PlayerTeam scoreboardTeam;
 
