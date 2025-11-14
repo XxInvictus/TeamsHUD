@@ -44,11 +44,12 @@ public class ModTeam extends net.minecraft.world.scores.Team {
     }
 
     public UUID getOwner() {
-        return players.stream().findFirst().orElseThrow();
+        return players.stream().findFirst().orElse(null);
     }
 
     public boolean playerHasPermissions(ServerPlayer player) {
-        return getOwner().equals(player.getUUID()) || player.hasPermissions(2);
+        UUID owner = getOwner();
+        return (owner != null && owner.equals(player.getUUID())) || player.hasPermissions(2);
     }
     public Collection<ServerPlayer> getOnlinePlayers() {
         return onlinePlayers.values();
@@ -180,7 +181,14 @@ public class ModTeam extends net.minecraft.world.scores.Team {
     }
 
     private String getNameFromUUID(UUID id) {
-        return teamDB.serverLevel.getServer().getProfileCache().get(id).map(GameProfile::getName).orElseThrow();
+        if (id == null) {
+            return "Unknown";
+        }
+        var profileCache = teamDB.serverLevel.getServer().getProfileCache();
+        if (profileCache == null) {
+            return "Unknown";
+        }
+        return profileCache.get(id).map(GameProfile::getName).orElse("Unknown");
     }
 
     static ModTeam fromNBT(CompoundTag compound, TeamDB teamDB) {
