@@ -18,4 +18,5 @@ public interface MultiloaderConfig {
     boolean showHunger();
     boolean syncAdvancements();
     int compassDetectionDistance();
+    int maxCompassDetectionDistance();
 }

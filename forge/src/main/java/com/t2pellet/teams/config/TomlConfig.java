@@ -67,6 +67,11 @@ public class TomlConfig implements MultiloaderConfig {
         return Client.compassDetectionDistance.get();
     }
 
+    @Override
+    public int maxCompassDetectionDistance() {
+        return Server.maxCompassDetectionDistance.get();
+    }
+
     public static class Server {
         public static ForgeConfigSpec.BooleanValue showInvisibleTeammates;
         public static ForgeConfigSpec.BooleanValue friendlyFireEnabled;
@@ -75,6 +80,7 @@ public class TomlConfig implements MultiloaderConfig {
         public static ForgeConfigSpec.EnumValue<Team.Visibility> deathMessageVisibility;
         public static ForgeConfigSpec.ConfigValue<Team.CollisionRule> collisionRule;
         public static ForgeConfigSpec.BooleanValue syncAdvancements;
+        public static ForgeConfigSpec.IntValue maxCompassDetectionDistance;
 
         public Server(ForgeConfigSpec.Builder builder) {
             builder.push("general");
@@ -85,6 +91,7 @@ public class TomlConfig implements MultiloaderConfig {
             deathMessageVisibility = builder.defineEnum("death_message_visibility", Team.Visibility.ALWAYS);
             collisionRule = builder.comment("Note that 'push own team' and 'push other teams' are swapped.").defineEnum("collision_rule", Team.CollisionRule.PUSH_OWN_TEAM);
             syncAdvancements = builder.comment("Sync advancements between team members").define("sync_advancements", true);
+            maxCompassDetectionDistance = builder.comment("Server-enforced maximum compass detection distance (in blocks). Client settings cannot exceed this value.").defineInRange("max_compass_detection_distance", 512, 16, 2048);
             builder.pop();
         }
     }

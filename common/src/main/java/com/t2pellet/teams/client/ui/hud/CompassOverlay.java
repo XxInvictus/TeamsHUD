@@ -83,7 +83,9 @@ public class CompassOverlay {
         double diffPosX = player.position().x - client.player.position().x;
         double diffPosZ = player.position().z - client.player.position().z;
         double magnitude =  Math.sqrt(diffPosX * diffPosX + diffPosZ * diffPosZ);
-        int maxDist = Services.PLATFORM.getConfig().compassDetectionDistance();
+        int clientMaxDist = Services.PLATFORM.getConfig().compassDetectionDistance();
+        int serverMaxDist = Services.PLATFORM.getConfig().maxCompassDetectionDistance();
+        int maxDist = Math.min(clientMaxDist, serverMaxDist);
 
         if (magnitude >= maxDist) {
             return 1;

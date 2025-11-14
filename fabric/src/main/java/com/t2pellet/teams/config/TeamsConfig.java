@@ -28,6 +28,9 @@ public class TeamsConfig implements ConfigData, MultiloaderConfig {
     @ConfigEntry.Category("ModTeam Defaults")
     @Comment("Sync advancements between team members")
     public boolean syncAdvancements = true;
+    @ConfigEntry.Category("ModTeam Defaults")
+    @Comment("Server-enforced maximum compass detection distance (in blocks). Client settings cannot exceed this value.")
+    public int maxCompassDetectionDistance = 512;
 
     @ConfigEntry.Category("Visual")
     public boolean enableCompassHUD = true;
@@ -101,5 +104,10 @@ public class TeamsConfig implements ConfigData, MultiloaderConfig {
     @Override
     public int compassDetectionDistance() {
         return compassDetectionDistance;
+    }
+
+    @Override
+    public int maxCompassDetectionDistance() {
+        return maxCompassDetectionDistance;
     }
 }
