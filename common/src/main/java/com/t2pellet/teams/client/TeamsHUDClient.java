@@ -121,8 +121,8 @@ public class TeamsHUDClient {
                 if (!skinVal.isEmpty()) {
                     GameProfile dummy = new GameProfile(UUID.randomUUID(), "");
                     dummy.getProperties().put("textures", new Property("textures", skinVal, skinSig));
-                    Minecraft.getInstance().getSkinManager().registerSkins(dummy, (type1, id, texture) -> {
-                        if (type1 == MinecraftProfileTexture.Type.SKIN) {
+                    Minecraft.getInstance().getSkinManager().registerSkins(dummy, (textureType, id, texture) -> {
+                        if (textureType == MinecraftProfileTexture.Type.SKIN) {
                             ClientTeam.INSTANCE.addPlayer(uuid, name, id, health, hunger);
                         }
                     }, false);
