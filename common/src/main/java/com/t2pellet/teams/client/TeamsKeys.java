@@ -51,7 +51,7 @@ public class TeamsKeys {
             ToastRequested requested = toastManager.getToast(ToastRequested.class, Toast.NO_TOKEN);
             if (requested != null) {
                 requested.respond();
-                Services.PLATFORM.sendToServer(new C2STeamJoinPacket(ClientTeam.INSTANCE.getName()));//todo?
+                Services.PLATFORM.sendToServer(new C2STeamJoinPacket(ClientTeam.INSTANCE.getName()));
             }
         }
     });
