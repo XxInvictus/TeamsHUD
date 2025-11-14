@@ -57,6 +57,16 @@ public class TomlConfig implements MultiloaderConfig {
         return Client.showHunger.get();
     }
 
+    @Override
+    public boolean syncAdvancements() {
+        return Server.syncAdvancements.get();
+    }
+
+    @Override
+    public int compassDetectionDistance() {
+        return Client.compassDetectionDistance.get();
+    }
+
     public static class Server {
         public static ForgeConfigSpec.BooleanValue showInvisibleTeammates;
         public static ForgeConfigSpec.BooleanValue friendlyFireEnabled;
@@ -64,6 +74,7 @@ public class TomlConfig implements MultiloaderConfig {
         public static ForgeConfigSpec.EnumValue<ChatFormatting> colour;
         public static ForgeConfigSpec.EnumValue<Team.Visibility> deathMessageVisibility;
         public static ForgeConfigSpec.ConfigValue<Team.CollisionRule> collisionRule;
+        public static ForgeConfigSpec.BooleanValue syncAdvancements;
 
         public Server(ForgeConfigSpec.Builder builder) {
             builder.push("general");
@@ -73,6 +84,7 @@ public class TomlConfig implements MultiloaderConfig {
             colour = builder.defineEnum("colour",ChatFormatting.BOLD);
             deathMessageVisibility = builder.defineEnum("death_message_visibility", Team.Visibility.ALWAYS);
             collisionRule = builder.comment("Note that 'push own team' and 'push other teams' are swapped.").defineEnum("collision_rule", Team.CollisionRule.PUSH_OWN_TEAM);
+            syncAdvancements = builder.comment("Sync advancements between team members").define("sync_advancements", true);
             builder.pop();
         }
     }
@@ -82,6 +94,7 @@ public class TomlConfig implements MultiloaderConfig {
         public static ForgeConfigSpec.BooleanValue enableStatusHUD;
         public static ForgeConfigSpec.IntValue toastDuration;
         public static ForgeConfigSpec.BooleanValue showHunger;
+        public static ForgeConfigSpec.IntValue compassDetectionDistance;
 
         public Client(ForgeConfigSpec.Builder builder) {
             builder.push("visual");
@@ -89,6 +102,7 @@ public class TomlConfig implements MultiloaderConfig {
             enableStatusHUD = builder.define("enable_status_hud",true);
             toastDuration = builder.comment("How long teams toast notifications should last").defineInRange("toast_duration",5,0,100000000);
             showHunger = builder.comment("Show other team members' hunger").define("show_hunger",true);
+            compassDetectionDistance = builder.comment("Maximum detection distance for the compass HUD (in blocks)").defineInRange("compass_detection_distance", 128, 16, 1024);
             builder.pop();
         }
     }

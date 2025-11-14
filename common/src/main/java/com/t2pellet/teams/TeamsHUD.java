@@ -34,6 +34,9 @@ public class TeamsHUD {
     }
 
     public static void onAdvancement(ServerPlayer player, Advancement advancement) {
+        if (!Services.PLATFORM.getConfig().syncAdvancements()) {
+            return;
+        }
         TeamDB teamDB = TeamDB.getOrMakeDefault(player.server);
         ModTeam team = teamDB.getTeam(player);
         if (team != null) {

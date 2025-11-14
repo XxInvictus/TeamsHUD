@@ -105,10 +105,12 @@ public class ModTeam extends net.minecraft.world.scores.Team {
             }
         }
         // Advancement Sync
-        for (Advancement advancement : getAdvancements()) {
-            AdvancementProgress progress = player.getAdvancements().getOrStartProgress(advancement);
-            for (String criterion : progress.getRemainingCriteria()) {
-                player.getAdvancements().award(advancement, criterion);
+        if (Services.PLATFORM.getConfig().syncAdvancements()) {
+            for (Advancement advancement : getAdvancements()) {
+                AdvancementProgress progress = player.getAdvancements().getOrStartProgress(advancement);
+                for (String criterion : progress.getRemainingCriteria()) {
+                    player.getAdvancements().award(advancement, criterion);
+                }
             }
         }
     }
@@ -145,10 +147,12 @@ public class ModTeam extends net.minecraft.world.scores.Team {
             Services.PLATFORM.sendToClients(new S2CTeamUpdatePacket(name, playerName, S2CTeamUpdatePacket.Action.JOINED, false), getOnlinePlayers());
             playerOnline(playerEntity, true);
             // Advancement Sync
-            Set<Advancement> advancements = ((AdvancementAccessor) playerEntity.getAdvancements()).getVisibleAdvancements();
-            for (Advancement advancement : advancements) {
-                if (playerEntity.getAdvancements().getOrStartProgress(advancement).isDone()) {
-                    addAdvancement(advancement);
+            if (Services.PLATFORM.getConfig().syncAdvancements()) {
+                Set<Advancement> advancements = ((AdvancementAccessor) playerEntity.getAdvancements()).getVisibleAdvancements();
+                for (Advancement advancement : advancements) {
+                    if (playerEntity.getAdvancements().getOrStartProgress(advancement).isDone()) {
+                        addAdvancement(advancement);
+                    }
                 }
             }
         }

@@ -25,6 +25,9 @@ public class TeamsConfig implements ConfigData, MultiloaderConfig {
     @ConfigEntry.Category("ModTeam Defaults")
     @Comment("Note that 'push own team' and 'push other teams' are swapped.")
     public Team.CollisionRule collisionRule = Team.CollisionRule.PUSH_OWN_TEAM;
+    @ConfigEntry.Category("ModTeam Defaults")
+    @Comment("Sync advancements between team members")
+    public boolean syncAdvancements = true;
 
     @ConfigEntry.Category("Visual")
     public boolean enableCompassHUD = true;
@@ -36,6 +39,9 @@ public class TeamsConfig implements ConfigData, MultiloaderConfig {
     @ConfigEntry.Category("Visual")
     @Comment("Show other team members' hunger")
     public boolean showHunger = true;
+    @ConfigEntry.Category("Visual")
+    @Comment("Maximum detection distance for the compass HUD (in blocks)")
+    public int compassDetectionDistance = 128;
 
     @Override
     public boolean showInvisibleTeammates() {
@@ -85,5 +91,15 @@ public class TeamsConfig implements ConfigData, MultiloaderConfig {
     @Override
     public boolean showHunger() {
         return showHunger;
+    }
+
+    @Override
+    public boolean syncAdvancements() {
+        return syncAdvancements;
+    }
+
+    @Override
+    public int compassDetectionDistance() {
+        return compassDetectionDistance;
     }
 }

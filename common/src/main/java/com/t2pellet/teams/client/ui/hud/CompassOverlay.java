@@ -14,7 +14,6 @@ public class CompassOverlay {
     private static final int HUD_HEIGHT = 5;
 
     private static final int MIN_DIST = 12;
-    private static final int MAX_DIST = 128;
     private static final float MIN_SCALE = 0.2f;
     private static final float MAX_SCALE = 0.4f;
     private static final float MIN_ALPHA = 0.4f;
@@ -84,13 +83,14 @@ public class CompassOverlay {
         double diffPosX = player.position().x - client.player.position().x;
         double diffPosZ = player.position().z - client.player.position().z;
         double magnitude =  Math.sqrt(diffPosX * diffPosX + diffPosZ * diffPosZ);
+        int maxDist = Services.PLATFORM.getConfig().compassDetectionDistance();
 
-        if (magnitude >= MAX_DIST) {
+        if (magnitude >= maxDist) {
             return 1;
         } else if (magnitude <= MIN_DIST) {
             return 0;
         } else {
-            return (float) ((magnitude - MIN_DIST) / (MAX_DIST - MIN_DIST));
+            return (float) ((magnitude - MIN_DIST) / (maxDist - MIN_DIST));
         }
     }
 
