@@ -124,8 +124,8 @@ public class TeamDB extends SavedData {
         for (var tag : list) {
             try {
                 addTeam(ModTeam.fromNBT((CompoundTag) tag,this));
-            } catch (ModTeam.TeamException ex) {
-                TeamsHUD.LOGGER.error("Failed to load team from NBT" + ex.getMessage());
+            } catch (Exception ex) {
+                TeamsHUD.LOGGER.error("Failed to load team from NBT: {}", ex.getMessage(), ex);
             }
         }
     }
