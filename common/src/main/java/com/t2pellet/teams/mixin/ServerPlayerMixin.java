@@ -52,7 +52,14 @@ public abstract class ServerPlayerMixin extends Player implements IHasTeam {
 
 	@Override
 	public boolean isTeammate(ServerPlayer other) {
-		return team.equals(((IHasTeam) other).getTeam());
+		if (team == null || other == null) {
+			return false;
+		}
+		ModTeam otherTeam = ((IHasTeam) other).getTeam();
+		if (otherTeam == null) {
+			return false;
+		}
+		return team.equals(otherTeam);
 	}
 
 	@Inject(at = @At(value = "TAIL"), method = "addAdditionalSaveData")
