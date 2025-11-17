@@ -47,7 +47,12 @@ public class CompassOverlay {
     }
     
     public int getHeight() {
+        // Return unscaled height - scaling will be applied in hit detection
         return HUD_HEIGHT + 50; // Include space for heads
+    }
+    
+    public float getScale() {
+        return Services.PLATFORM.getConfig().compassOverlayScale();
     }
 
     public void render(GuiGraphics graphics) {
@@ -103,11 +108,6 @@ public class CompassOverlay {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
             graphics.blit(GUI_ICONS_LOCATION, baseX, baseY, 0, 74, HUD_WIDTH, HUD_HEIGHT);
             
-            // Render drag indicator if unlocked
-            if (!HudDragManager.isLocked()) {
-                renderDragIndicator(graphics);
-            }
-            
             RenderSystem.disableBlend();
             isShowing = true;
         } else {
@@ -115,13 +115,20 @@ public class CompassOverlay {
         }
         
         graphics.pose().popPose();
+        
+        // Render drag indicator if unlocked (outside scale transformation)
+        if (!HudDragManager.isLocked() && isShowing) {
+            renderDragIndicator(graphics, scale);
+        }
     }
     
-    private void renderDragIndicator(GuiGraphics graphics) {
-        // Draw a subtle border to indicate draggability
+    private void renderDragIndicator(GuiGraphics graphics, float scale) {
+        // Draw a subtle border to indicate draggability (using scaled dimensions)
         int color = HudDragManager.getCurrentTarget() == HudDragManager.DragTarget.COMPASS 
             ? 0x8800FF00 : 0x44FFFFFF;
-        graphics.fill(baseX - 1, baseY - 1, baseX + HUD_WIDTH + 1, baseY + HUD_HEIGHT + 50, color);
+        int scaledWidth = (int) (HUD_WIDTH * scale);
+        int scaledHeight = (int) ((HUD_HEIGHT + 50) * scale);
+        graphics.fill(baseX - 1, baseY - 1, baseX + scaledWidth + 1, baseY + scaledHeight + 1, color);
     }
 
     private double caculateRotationHead() {

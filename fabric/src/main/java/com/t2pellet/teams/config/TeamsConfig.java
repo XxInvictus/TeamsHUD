@@ -59,9 +59,6 @@ public class TeamsConfig implements ConfigData, MultiloaderConfig {
     @Comment("Y position of the compass overlay (-1 for default)")
     public int compassOverlayY = -1;
     @ConfigEntry.Category("HUD Positioning")
-    @Comment("Lock HUD elements to prevent dragging")
-    public boolean hudLocked = true;
-    @ConfigEntry.Category("HUD Positioning")
     @Comment("Scale of the status overlay (1.0 = default, 0.1 = 10%, 2.0 = 200%)")
     public float statusOverlayScale = 1.0f;
     @ConfigEntry.Category("HUD Positioning")
@@ -154,11 +151,6 @@ public class TeamsConfig implements ConfigData, MultiloaderConfig {
     }
 
     @Override
-    public boolean hudLocked() {
-        return hudLocked;
-    }
-
-    @Override
     public float statusOverlayScale() {
         return statusOverlayScale;
     }
@@ -186,11 +178,6 @@ public class TeamsConfig implements ConfigData, MultiloaderConfig {
     @Override
     public void setCompassOverlayY(int y) {
         this.compassOverlayY = y;
-    }
-
-    @Override
-    public void setHudLocked(boolean locked) {
-        this.hudLocked = locked;
     }
 
     @Override

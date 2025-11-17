@@ -93,11 +93,6 @@ public class TomlConfig implements MultiloaderConfig {
     }
 
     @Override
-    public boolean hudLocked() {
-        return Client.hudLocked.get();
-    }
-
-    @Override
     public float statusOverlayScale() {
         return Client.statusOverlayScale.get().floatValue();
     }
@@ -125,11 +120,6 @@ public class TomlConfig implements MultiloaderConfig {
     @Override
     public void setCompassOverlayY(int y) {
         Client.compassOverlayY.set(y);
-    }
-
-    @Override
-    public void setHudLocked(boolean locked) {
-        Client.hudLocked.set(locked);
     }
 
     @Override
@@ -176,7 +166,6 @@ public class TomlConfig implements MultiloaderConfig {
         public static ForgeConfigSpec.IntValue statusOverlayY;
         public static ForgeConfigSpec.IntValue compassOverlayX;
         public static ForgeConfigSpec.IntValue compassOverlayY;
-        public static ForgeConfigSpec.BooleanValue hudLocked;
         public static ForgeConfigSpec.DoubleValue statusOverlayScale;
         public static ForgeConfigSpec.DoubleValue compassOverlayScale;
 
@@ -194,7 +183,6 @@ public class TomlConfig implements MultiloaderConfig {
             statusOverlayY = builder.comment("Y position of the status overlay (-1 for default)").defineInRange("status_overlay_y", -1, -1, 10000);
             compassOverlayX = builder.comment("X position of the compass overlay (-1 for default)").defineInRange("compass_overlay_x", -1, -1, 10000);
             compassOverlayY = builder.comment("Y position of the compass overlay (-1 for default)").defineInRange("compass_overlay_y", -1, -1, 10000);
-            hudLocked = builder.comment("Lock HUD elements to prevent dragging").define("hud_locked", true);
             statusOverlayScale = builder.comment("Scale of the status overlay (1.0 = default, 0.1 = 10%, 2.0 = 200%)").defineInRange("status_overlay_scale", 1.0, 0.1, 3.0);
             compassOverlayScale = builder.comment("Scale of the compass overlay (1.0 = default, 0.1 = 10%, 2.0 = 200%)").defineInRange("compass_overlay_scale", 1.0, 0.1, 3.0);
             builder.pop();

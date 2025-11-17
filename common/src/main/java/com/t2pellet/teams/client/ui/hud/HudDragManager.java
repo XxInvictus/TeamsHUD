@@ -16,14 +16,14 @@ public class HudDragManager {
     private static int dragStartY = 0;
     private static int elementStartX = 0;
     private static int elementStartY = 0;
+    private static boolean locked = true; // Runtime lock state, defaults to locked
     
     public static boolean isLocked() {
-        return Services.PLATFORM.getConfig().hudLocked();
+        return locked;
     }
     
     public static void toggleLock() {
-        boolean newLocked = !isLocked();
-        Services.PLATFORM.getConfig().setHudLocked(newLocked);
+        locked = !locked;
     }
     
     public static boolean isDragging() {

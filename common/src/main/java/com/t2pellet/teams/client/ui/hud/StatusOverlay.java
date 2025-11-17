@@ -43,7 +43,12 @@ public class StatusOverlay {
     }
     
     public int getHeight() {
+        // Return unscaled height - scaling will be applied in hit detection
         return totalHeight;
+    }
+    
+    public float getScale() {
+        return Services.PLATFORM.getConfig().statusOverlayScale();
     }
 
     public void render(GuiGraphics graphics) {
@@ -83,21 +88,24 @@ public class StatusOverlay {
             ++shown;
         }
         
+        // Store unscaled height, will be scaled for hit detection
         totalHeight = offsetY;
         
-        // Render drag indicator if unlocked
-        if (!HudDragManager.isLocked() && totalHeight > 0) {
-            renderDragIndicator(graphics);
-        }
-        
         graphics.pose().popPose();
+        
+        // Render drag indicator if unlocked (outside scale transformation)
+        if (!HudDragManager.isLocked() && totalHeight > 0) {
+            renderDragIndicator(graphics, scale);
+        }
     }
     
-    private void renderDragIndicator(GuiGraphics graphics) {
-        // Draw a subtle border to indicate draggability
+    private void renderDragIndicator(GuiGraphics graphics, float scale) {
+        // Draw a subtle border to indicate draggability (using scaled dimensions)
         int color = HudDragManager.getCurrentTarget() == HudDragManager.DragTarget.STATUS 
             ? 0x8800FF00 : 0x44FFFFFF;
-        graphics.fill(baseX - 1, baseY - 1, baseX + OVERLAY_WIDTH + 1, baseY + totalHeight + 1, color);
+        int scaledWidth = (int) (OVERLAY_WIDTH * scale);
+        int scaledHeight = (int) (totalHeight * scale);
+        graphics.fill(baseX - 1, baseY - 1, baseX + scaledWidth + 1, baseY + scaledHeight + 1, color);
     }
 
     private void renderStatus(GuiGraphics graphics, ClientTeam.Teammate teammate) {
