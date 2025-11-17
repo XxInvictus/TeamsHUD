@@ -56,9 +56,10 @@ public class CompassOverlay {
             return;
         }
 
-        // Get position from config
+        // Get position and scale from config
         int configX = Services.PLATFORM.getConfig().compassOverlayX();
         int configY = Services.PLATFORM.getConfig().compassOverlayY();
+        float scale = Services.PLATFORM.getConfig().compassOverlayScale();
         
         // Use default position if not set (centered at top)
         if (configX == -1) {
@@ -72,6 +73,12 @@ public class CompassOverlay {
         } else {
             baseY = configY;
         }
+
+        // Apply scale transformation
+        graphics.pose().pushPose();
+        graphics.pose().translate(baseX, baseY, 0);
+        graphics.pose().scale(scale, scale, 1.0f);
+        graphics.pose().translate(-baseX, -baseY, 0);
 
         // Render heads
         boolean renderedAnyHead = false;
@@ -106,6 +113,8 @@ public class CompassOverlay {
         } else {
             isShowing = false;
         }
+        
+        graphics.pose().popPose();
     }
     
     private void renderDragIndicator(GuiGraphics graphics) {

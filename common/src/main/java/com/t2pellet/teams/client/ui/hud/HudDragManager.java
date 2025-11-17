@@ -84,8 +84,10 @@ public class HudDragManager {
         }
     }
     
-    public static boolean isMouseOver(int mouseX, int mouseY, int x, int y, int width, int height) {
-        return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+    public static boolean isMouseOver(int mouseX, int mouseY, int x, int y, int width, int height, float scale) {
+        int scaledWidth = (int) (width * scale);
+        int scaledHeight = (int) (height * scale);
+        return mouseX >= x && mouseX <= x + scaledWidth && mouseY >= y && mouseY <= y + scaledHeight;
     }
     
     public static void resetPosition(DragTarget target) {

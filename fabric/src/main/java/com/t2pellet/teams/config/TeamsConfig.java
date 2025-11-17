@@ -61,6 +61,12 @@ public class TeamsConfig implements ConfigData, MultiloaderConfig {
     @ConfigEntry.Category("HUD Positioning")
     @Comment("Lock HUD elements to prevent dragging")
     public boolean hudLocked = true;
+    @ConfigEntry.Category("HUD Positioning")
+    @Comment("Scale of the status overlay (1.0 = default, 0.1 = 10%, 2.0 = 200%)")
+    public float statusOverlayScale = 1.0f;
+    @ConfigEntry.Category("HUD Positioning")
+    @Comment("Scale of the compass overlay (1.0 = default, 0.1 = 10%, 2.0 = 200%)")
+    public float compassOverlayScale = 1.0f;
 
     @Override
     public boolean showInvisibleTeammates() {
@@ -153,6 +159,16 @@ public class TeamsConfig implements ConfigData, MultiloaderConfig {
     }
 
     @Override
+    public float statusOverlayScale() {
+        return statusOverlayScale;
+    }
+
+    @Override
+    public float compassOverlayScale() {
+        return compassOverlayScale;
+    }
+
+    @Override
     public void setStatusOverlayX(int x) {
         this.statusOverlayX = x;
     }
@@ -175,5 +191,15 @@ public class TeamsConfig implements ConfigData, MultiloaderConfig {
     @Override
     public void setHudLocked(boolean locked) {
         this.hudLocked = locked;
+    }
+
+    @Override
+    public void setStatusOverlayScale(float scale) {
+        this.statusOverlayScale = scale;
+    }
+
+    @Override
+    public void setCompassOverlayScale(float scale) {
+        this.compassOverlayScale = scale;
     }
 }

@@ -26,10 +26,14 @@ public interface MultiloaderConfig {
     int compassOverlayX();
     int compassOverlayY();
     boolean hudLocked();
+    float statusOverlayScale();
+    float compassOverlayScale();
     
     void setStatusOverlayX(int x);
     void setStatusOverlayY(int y);
     void setCompassOverlayX(int x);
     void setCompassOverlayY(int y);
     void setHudLocked(boolean locked);
+    void setStatusOverlayScale(float scale);
+    void setCompassOverlayScale(float scale);
 }

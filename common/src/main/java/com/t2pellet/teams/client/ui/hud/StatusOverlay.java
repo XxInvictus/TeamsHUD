@@ -49,9 +49,10 @@ public class StatusOverlay {
     public void render(GuiGraphics graphics) {
         offsetY = 0;
         
-        // Get position from config
+        // Get position and scale from config
         int configX = Services.PLATFORM.getConfig().statusOverlayX();
         int configY = Services.PLATFORM.getConfig().statusOverlayY();
+        float scale = Services.PLATFORM.getConfig().statusOverlayScale();
         
         // Use default position if not set
         if (configX == -1) {
@@ -65,6 +66,12 @@ public class StatusOverlay {
         } else {
             baseY = configY;
         }
+        
+        // Apply scale transformation
+        graphics.pose().pushPose();
+        graphics.pose().translate(baseX, baseY, 0);
+        graphics.pose().scale(scale, scale, 1.0f);
+        graphics.pose().translate(-baseX, -baseY, 0);
         
         List<ClientTeam.Teammate> teammates = ClientTeam.INSTANCE.getTeammates();
         int shown = 0;
@@ -82,6 +89,8 @@ public class StatusOverlay {
         if (!HudDragManager.isLocked() && totalHeight > 0) {
             renderDragIndicator(graphics);
         }
+        
+        graphics.pose().popPose();
     }
     
     private void renderDragIndicator(GuiGraphics graphics) {

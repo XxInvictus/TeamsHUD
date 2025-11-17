@@ -97,8 +97,9 @@ public class TeamsHUDClient {
             int statusY = status.getBaseY();
             int statusWidth = status.getWidth();
             int statusHeight = status.getHeight();
+            float statusScale = com.t2pellet.teams.platform.Services.PLATFORM.getConfig().statusOverlayScale();
             
-            if (com.t2pellet.teams.client.ui.hud.HudDragManager.isMouseOver(scaledMouseX, scaledMouseY, statusX, statusY, statusWidth, statusHeight)) {
+            if (com.t2pellet.teams.client.ui.hud.HudDragManager.isMouseOver(scaledMouseX, scaledMouseY, statusX, statusY, statusWidth, statusHeight, statusScale)) {
                 com.t2pellet.teams.client.ui.hud.HudDragManager.startDrag(
                     com.t2pellet.teams.client.ui.hud.HudDragManager.DragTarget.STATUS,
                     scaledMouseX, scaledMouseY, statusX, statusY
@@ -113,8 +114,9 @@ public class TeamsHUDClient {
             int compassY = compass.getBaseY();
             int compassWidth = compass.getWidth();
             int compassHeight = compass.getHeight();
+            float compassScale = com.t2pellet.teams.platform.Services.PLATFORM.getConfig().compassOverlayScale();
             
-            if (com.t2pellet.teams.client.ui.hud.HudDragManager.isMouseOver(scaledMouseX, scaledMouseY, compassX, compassY, compassWidth, compassHeight)) {
+            if (com.t2pellet.teams.client.ui.hud.HudDragManager.isMouseOver(scaledMouseX, scaledMouseY, compassX, compassY, compassWidth, compassHeight, compassScale)) {
                 com.t2pellet.teams.client.ui.hud.HudDragManager.startDrag(
                     com.t2pellet.teams.client.ui.hud.HudDragManager.DragTarget.COMPASS,
                     scaledMouseX, scaledMouseY, compassX, compassY

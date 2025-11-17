@@ -98,6 +98,16 @@ public class TomlConfig implements MultiloaderConfig {
     }
 
     @Override
+    public float statusOverlayScale() {
+        return Client.statusOverlayScale.get().floatValue();
+    }
+
+    @Override
+    public float compassOverlayScale() {
+        return Client.compassOverlayScale.get().floatValue();
+    }
+
+    @Override
     public void setStatusOverlayX(int x) {
         Client.statusOverlayX.set(x);
     }
@@ -120,6 +130,16 @@ public class TomlConfig implements MultiloaderConfig {
     @Override
     public void setHudLocked(boolean locked) {
         Client.hudLocked.set(locked);
+    }
+
+    @Override
+    public void setStatusOverlayScale(float scale) {
+        Client.statusOverlayScale.set((double) scale);
+    }
+
+    @Override
+    public void setCompassOverlayScale(float scale) {
+        Client.compassOverlayScale.set((double) scale);
     }
 
     public static class Server {
@@ -157,6 +177,8 @@ public class TomlConfig implements MultiloaderConfig {
         public static ForgeConfigSpec.IntValue compassOverlayX;
         public static ForgeConfigSpec.IntValue compassOverlayY;
         public static ForgeConfigSpec.BooleanValue hudLocked;
+        public static ForgeConfigSpec.DoubleValue statusOverlayScale;
+        public static ForgeConfigSpec.DoubleValue compassOverlayScale;
 
         public Client(ForgeConfigSpec.Builder builder) {
             builder.push("visual");
@@ -173,6 +195,8 @@ public class TomlConfig implements MultiloaderConfig {
             compassOverlayX = builder.comment("X position of the compass overlay (-1 for default)").defineInRange("compass_overlay_x", -1, -1, 10000);
             compassOverlayY = builder.comment("Y position of the compass overlay (-1 for default)").defineInRange("compass_overlay_y", -1, -1, 10000);
             hudLocked = builder.comment("Lock HUD elements to prevent dragging").define("hud_locked", true);
+            statusOverlayScale = builder.comment("Scale of the status overlay (1.0 = default, 0.1 = 10%, 2.0 = 200%)").defineInRange("status_overlay_scale", 1.0, 0.1, 3.0);
+            compassOverlayScale = builder.comment("Scale of the compass overlay (1.0 = default, 0.1 = 10%, 2.0 = 200%)").defineInRange("compass_overlay_scale", 1.0, 0.1, 3.0);
             builder.pop();
         }
     }
