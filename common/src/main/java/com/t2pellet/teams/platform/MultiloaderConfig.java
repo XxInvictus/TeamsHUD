@@ -19,4 +19,17 @@ public interface MultiloaderConfig {
     boolean syncAdvancements();
     int compassDetectionDistance();
     int maxCompassDetectionDistance();
+    
+    // HUD positioning
+    int statusOverlayX();
+    int statusOverlayY();
+    int compassOverlayX();
+    int compassOverlayY();
+    boolean hudLocked();
+    
+    void setStatusOverlayX(int x);
+    void setStatusOverlayY(int y);
+    void setCompassOverlayX(int x);
+    void setCompassOverlayY(int y);
+    void setHudLocked(boolean locked);
 }

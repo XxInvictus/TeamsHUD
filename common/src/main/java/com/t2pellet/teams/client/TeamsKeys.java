@@ -74,10 +74,17 @@ public class TeamsKeys {
         TeamsHUDClient.status.enabled = !TeamsHUDClient.status.enabled;
     });
 
+    public static final TeamsKey TOGGLE_HUD_LOCK = new TeamsKey("key.teams.toggle_hud_lock", GLFW.GLFW_KEY_L, client -> {
+        com.t2pellet.teams.client.ui.hud.HudDragManager.toggleLock();
+        String lockState = com.t2pellet.teams.client.ui.hud.HudDragManager.isLocked() ? "locked" : "unlocked";
+        client.player.displayClientMessage(net.minecraft.network.chat.Component.literal("HUD " + lockState), true);
+    });
+
     static final TeamsKey[] KEYS = {
             ACCEPT,
             REJECT,
-            TOGGLE_HUD
+            TOGGLE_HUD,
+            TOGGLE_HUD_LOCK
     };
 
 }

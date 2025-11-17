@@ -23,6 +23,8 @@ public class CompassOverlay {
     public boolean enabled = true;
     private final Minecraft client;
     private boolean isShowing = false;
+    private int baseX = 0;
+    private int baseY = 0;
 
     public CompassOverlay() {
         this.client = Minecraft.getInstance();
@@ -31,11 +33,44 @@ public class CompassOverlay {
     public boolean isShowing() {
         return isShowing;
     }
+    
+    public int getBaseX() {
+        return baseX;
+    }
+    
+    public int getBaseY() {
+        return baseY;
+    }
+    
+    public int getWidth() {
+        return HUD_WIDTH;
+    }
+    
+    public int getHeight() {
+        return HUD_HEIGHT + 50; // Include space for heads
+    }
 
     public void render(GuiGraphics graphics) {
         if (!Services.PLATFORM.getConfig().enableCompassHUD() || !enabled) {
             isShowing = false;
             return;
+        }
+
+        // Get position from config
+        int configX = Services.PLATFORM.getConfig().compassOverlayX();
+        int configY = Services.PLATFORM.getConfig().compassOverlayY();
+        
+        // Use default position if not set (centered at top)
+        if (configX == -1) {
+            baseX = (client.getWindow().getGuiScaledWidth() - HUD_WIDTH) / 2;
+        } else {
+            baseX = configX;
+        }
+        
+        if (configY == -1) {
+            baseY = 5 + HUD_HEIGHT / 2;
+        } else {
+            baseY = configY;
         }
 
         // Render heads
@@ -56,17 +91,28 @@ public class CompassOverlay {
 
         // Render bar
         if (ClientTeam.INSTANCE.isInTeam() && !ClientTeam.INSTANCE.isTeamEmpty() && renderedAnyHead) {
-            var x = (client.getWindow().getGuiScaledWidth() - HUD_WIDTH) / 2;
-            var y = 5 + HUD_HEIGHT / 2;
             float alpha = (1 - minScale) * (1 - MIN_ALPHA) + MIN_ALPHA;
             RenderSystem.enableBlend();
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
-            graphics.blit(GUI_ICONS_LOCATION, x, y, 0, 74, HUD_WIDTH, HUD_HEIGHT);
+            graphics.blit(GUI_ICONS_LOCATION, baseX, baseY, 0, 74, HUD_WIDTH, HUD_HEIGHT);
+            
+            // Render drag indicator if unlocked
+            if (!HudDragManager.isLocked()) {
+                renderDragIndicator(graphics);
+            }
+            
             RenderSystem.disableBlend();
             isShowing = true;
         } else {
             isShowing = false;
         }
+    }
+    
+    private void renderDragIndicator(GuiGraphics graphics) {
+        // Draw a subtle border to indicate draggability
+        int color = HudDragManager.getCurrentTarget() == HudDragManager.DragTarget.COMPASS 
+            ? 0x8800FF00 : 0x44FFFFFF;
+        graphics.fill(baseX - 1, baseY - 1, baseX + HUD_WIDTH + 1, baseY + HUD_HEIGHT + 50, color);
     }
 
     private double caculateRotationHead() {
@@ -117,9 +163,8 @@ public class CompassOverlay {
     }
 
     private void renderHUDHead(GuiGraphics graphics, ResourceLocation skin, float scaleFactor, double renderFactor) {
-        int scaledWidth = client.getWindow().getGuiScaledWidth();
-        int x = (int) (scaledWidth / 2 - HUD_WIDTH / 4 + renderFactor * HUD_WIDTH / 2 + 41);
-        int y = 5 + HUD_HEIGHT + 4;
+        int x = (int) (baseX + HUD_WIDTH / 2 - HUD_WIDTH / 4 + renderFactor * HUD_WIDTH / 2 + 41);
+        int y = baseY + HUD_HEIGHT + 4;
         float sizeFactor = scaleFactor * (MAX_SCALE - MIN_SCALE) + MIN_SCALE;
         float alphaFactor = (1 - scaleFactor) * (1 - MIN_ALPHA) + MIN_ALPHA;
         graphics.pose().pushPose();

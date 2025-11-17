@@ -12,6 +12,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class TeamsHUDClientForge {
 
+    private static boolean wasMousePressed = false;
+
     public static final IGuiOverlay compass = (gui, graphics, partialTick, width, height) -> TeamsHUDClient.compass.render(graphics);
     public static final IGuiOverlay status = (gui, graphics, partialTick, width, height) -> TeamsHUDClient.status.render(graphics);
 
@@ -26,10 +28,37 @@ public class TeamsHUDClientForge {
     static void clientDisconnect(ClientPlayerNetworkEvent.LoggingOut event) {
         TeamsHUDClient.clientDisconnect();
     }
+    
     static void clientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             TeamsHUDClient.endClientTick();
+            handleMouseDrag();
         }
+    }
+    
+    private static void handleMouseDrag() {
+        Minecraft client = Minecraft.getInstance();
+        if (client.screen != null) {
+            return; // Don't handle dragging when a screen is open
+        }
+        
+        boolean isMousePressed = org.lwjgl.glfw.GLFW.glfwGetMouseButton(client.getWindow().getWindow(), 0) == 1;
+        double[] mouseX = new double[1];
+        double[] mouseY = new double[1];
+        org.lwjgl.glfw.GLFW.glfwGetCursorPos(client.getWindow().getWindow(), mouseX, mouseY);
+        
+        if (isMousePressed && !wasMousePressed) {
+            // Mouse button just pressed
+            TeamsHUDClient.onMouseClick(mouseX[0], mouseY[0], 0);
+        } else if (isMousePressed && wasMousePressed) {
+            // Mouse button held down (dragging)
+            TeamsHUDClient.onMouseDrag(mouseX[0], mouseY[0], 0, 0, 0);
+        } else if (!isMousePressed && wasMousePressed) {
+            // Mouse button just released
+            TeamsHUDClient.onMouseRelease(mouseX[0], mouseY[0], 0);
+        }
+        
+        wasMousePressed = isMousePressed;
     }
 
     static void registerOverlays(RegisterGuiOverlaysEvent event) {

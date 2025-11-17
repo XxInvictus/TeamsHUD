@@ -80,6 +80,73 @@ public class TeamsHUDClient {
             }
         }
     }
+    
+    public static boolean onMouseClick(double mouseX, double mouseY, int button) {
+        // Only handle left click (button 0)
+        if (button != 0 || com.t2pellet.teams.client.ui.hud.HudDragManager.isLocked()) {
+            return false;
+        }
+        
+        Minecraft client = Minecraft.getInstance();
+        int scaledMouseX = (int) (mouseX * client.getWindow().getGuiScaledWidth() / client.getWindow().getScreenWidth());
+        int scaledMouseY = (int) (mouseY * client.getWindow().getGuiScaledHeight() / client.getWindow().getScreenHeight());
+        
+        // Check if clicking on status overlay
+        if (status.enabled && !ClientTeam.INSTANCE.isTeamEmpty()) {
+            int statusX = status.getBaseX();
+            int statusY = status.getBaseY();
+            int statusWidth = status.getWidth();
+            int statusHeight = status.getHeight();
+            
+            if (com.t2pellet.teams.client.ui.hud.HudDragManager.isMouseOver(scaledMouseX, scaledMouseY, statusX, statusY, statusWidth, statusHeight)) {
+                com.t2pellet.teams.client.ui.hud.HudDragManager.startDrag(
+                    com.t2pellet.teams.client.ui.hud.HudDragManager.DragTarget.STATUS,
+                    scaledMouseX, scaledMouseY, statusX, statusY
+                );
+                return true;
+            }
+        }
+        
+        // Check if clicking on compass overlay
+        if (compass.enabled && compass.isShowing()) {
+            int compassX = compass.getBaseX();
+            int compassY = compass.getBaseY();
+            int compassWidth = compass.getWidth();
+            int compassHeight = compass.getHeight();
+            
+            if (com.t2pellet.teams.client.ui.hud.HudDragManager.isMouseOver(scaledMouseX, scaledMouseY, compassX, compassY, compassWidth, compassHeight)) {
+                com.t2pellet.teams.client.ui.hud.HudDragManager.startDrag(
+                    com.t2pellet.teams.client.ui.hud.HudDragManager.DragTarget.COMPASS,
+                    scaledMouseX, scaledMouseY, compassX, compassY
+                );
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    public static boolean onMouseDrag(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (!com.t2pellet.teams.client.ui.hud.HudDragManager.isDragging()) {
+            return false;
+        }
+        
+        Minecraft client = Minecraft.getInstance();
+        int scaledMouseX = (int) (mouseX * client.getWindow().getGuiScaledWidth() / client.getWindow().getScreenWidth());
+        int scaledMouseY = (int) (mouseY * client.getWindow().getGuiScaledHeight() / client.getWindow().getScreenHeight());
+        
+        com.t2pellet.teams.client.ui.hud.HudDragManager.updateDrag(scaledMouseX, scaledMouseY);
+        return true;
+    }
+    
+    public static boolean onMouseRelease(double mouseX, double mouseY, int button) {
+        if (!com.t2pellet.teams.client.ui.hud.HudDragManager.isDragging()) {
+            return false;
+        }
+        
+        com.t2pellet.teams.client.ui.hud.HudDragManager.endDrag();
+        return true;
+    }
 
     public static void handleTeamUpdatePacket(String team, String player, S2CTeamUpdatePacket.Action action, boolean isLocal) {
         switch (action) {
