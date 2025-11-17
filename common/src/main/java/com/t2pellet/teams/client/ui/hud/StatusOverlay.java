@@ -129,14 +129,14 @@ public class StatusOverlay {
             graphics.drawString(client.font, ModComponents.literal(hunger), posX + 58, posY, ChatFormatting.WHITE.getColor());
         }
 
-        // Draw skin
+        // Draw skin (using relative positioning)
         graphics.pose().pushPose();
         graphics.pose().scale(0.5F, 0.5F, 0.5F);
-        graphics.blit(teammate.skin, 2 * (baseX + 4), 2 * posY + 8, 32, 32, 32, 32);
+        graphics.blit(teammate.skin, 2 * (posX + 4), 2 * posY + 8, 32, 32, 32, 32);
         graphics.pose().popPose();
 
         // Draw name
-        graphics.drawString(client.font, Component.literal(teammate.name), baseX + 20, posY - 15, ChatFormatting.WHITE.getColor());
+        graphics.drawString(client.font, Component.literal(teammate.name), posX + 20, posY - 15, ChatFormatting.WHITE.getColor());
 
         // Update count & offset
         offsetY += 46;
