@@ -92,7 +92,7 @@ public class TeamsHUDClient {
         int scaledMouseY = (int) (mouseY * client.getWindow().getGuiScaledHeight() / client.getWindow().getScreenHeight());
         
         // Check if clicking on status overlay
-        if (status.enabled && !ClientTeam.INSTANCE.isTeamEmpty()) {
+        if (status.enabled && ClientTeam.INSTANCE.isInTeam()) {
             int statusX = status.getBaseX();
             int statusY = status.getBaseY();
             int statusWidth = status.getWidth();

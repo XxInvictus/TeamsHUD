@@ -89,12 +89,13 @@ public class StatusOverlay {
         }
         
         // Store unscaled height, will be scaled for hit detection
-        totalHeight = offsetY;
+        // Use minimum height even when empty so overlay can be dragged
+        totalHeight = Math.max(offsetY, shown > 0 ? offsetY : OVERLAY_HEIGHT_PER_PLAYER);
         
         graphics.pose().popPose();
         
         // Render drag indicator if unlocked (outside scale transformation)
-        if (!HudDragManager.isLocked() && totalHeight > 0) {
+        if (!HudDragManager.isLocked()) {
             renderDragIndicator(graphics, scale);
         }
     }
