@@ -132,6 +132,21 @@ public class TomlConfig implements MultiloaderConfig {
         Client.compassOverlayScale.set((double) scale);
     }
 
+    @Override
+    public boolean showTeammateDistance() {
+        return Client.showTeammateDistance.get();
+    }
+
+    @Override
+    public int teammateDistanceUpdateFrequency() {
+        return Client.teammateDistanceUpdateFrequency.get();
+    }
+
+    @Override
+    public boolean distanceOnlyWithinCompassRange() {
+        return Client.distanceOnlyWithinCompassRange.get();
+    }
+
     public static class Server {
         public static ForgeConfigSpec.BooleanValue showInvisibleTeammates;
         public static ForgeConfigSpec.BooleanValue friendlyFireEnabled;
@@ -168,6 +183,9 @@ public class TomlConfig implements MultiloaderConfig {
         public static ForgeConfigSpec.IntValue compassOverlayY;
         public static ForgeConfigSpec.DoubleValue statusOverlayScale;
         public static ForgeConfigSpec.DoubleValue compassOverlayScale;
+        public static ForgeConfigSpec.BooleanValue showTeammateDistance;
+        public static ForgeConfigSpec.IntValue teammateDistanceUpdateFrequency;
+        public static ForgeConfigSpec.BooleanValue distanceOnlyWithinCompassRange;
 
         public Client(ForgeConfigSpec.Builder builder) {
             builder.push("visual");
@@ -185,6 +203,12 @@ public class TomlConfig implements MultiloaderConfig {
             compassOverlayY = builder.comment("Y position of the compass overlay (-1 for default)").defineInRange("compass_overlay_y", -1, -1, 10000);
             statusOverlayScale = builder.comment("Scale of the status overlay (1.0 = default, 0.1 = 10%, 2.0 = 200%)").defineInRange("status_overlay_scale", 1.0, 0.1, 3.0);
             compassOverlayScale = builder.comment("Scale of the compass overlay (1.0 = default, 0.1 = 10%, 2.0 = 200%)").defineInRange("compass_overlay_scale", 1.0, 0.1, 3.0);
+            builder.pop();
+            
+            builder.push("distance_counter");
+            showTeammateDistance = builder.comment("Show distance to teammates next to their names").define("show_teammate_distance", false);
+            teammateDistanceUpdateFrequency = builder.comment("How often to update teammate distances (in ticks). Higher = less overhead, lower = more accurate. Default: 20 (1 second)").defineInRange("teammate_distance_update_frequency", 20, 1, 200);
+            distanceOnlyWithinCompassRange = builder.comment("Only show distance when teammate is within compass detection range. Requires show_teammate_distance to be true.").define("distance_only_within_compass_range", false);
             builder.pop();
         }
     }

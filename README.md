@@ -46,6 +46,10 @@ A Minecraft mod that adds team management functionality with visual HUD elements
 - Compass HUD enable/disable
 - Status HUD enable/disable
 - Compass detection distance
+- **Distance Counter**: Show real-time distance to teammates
+  - Enable/disable teammate distance display
+  - Configurable update frequency (1-200 ticks)
+  - Option to show distance only within compass range
 
 ## Installation
 
@@ -83,6 +87,16 @@ A Minecraft mod that adds team management functionality with visual HUD elements
 - The status HUD displays real-time health and hunger information
 - Press **Toggle HUD** (B) to show/hide HUD elements
 - Configure detection distance and visibility in mod settings
+
+### Distance Tracking
+- **Real-time distance display**: Shows distance to teammates next to their names (e.g., "PlayerName - 123m")
+- **Configurable updates**: Set update frequency from 1-200 ticks (default: 20 ticks/1 second)
+  - Higher values = better performance, lower accuracy
+  - Lower values = more accurate, slight performance impact
+- **Compass range filtering**: Option to only show distance for teammates within compass detection range
+- **Automatic handling**: Distances automatically hide for dead teammates or those in unloaded chunks
+- **Configuration**: Enable in mod settings (`show_teammate_distance`, `teammate_distance_update_frequency`, `distance_only_within_compass_range`)
+- **Format**: Horizontal distance (X-Z plane) displayed in meters
 
 ## Building from Source
 

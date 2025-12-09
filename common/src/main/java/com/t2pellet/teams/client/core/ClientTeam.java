@@ -45,6 +45,7 @@ public interface ClientTeam {
         public final ResourceLocation skin;
         float health;
         int hunger;
+        double lastKnownDistance = -1.0; // -1.0 means not yet calculated
 
         Teammate(UUID id, String name, ResourceLocation skin, float health, int hunger) {
             this.id = id;
@@ -60,6 +61,14 @@ public interface ClientTeam {
 
         public int getHunger() {
             return hunger;
+        }
+
+        public double getDistance() {
+            return lastKnownDistance;
+        }
+
+        public void setDistance(double distance) {
+            this.lastKnownDistance = distance;
         }
     }
 

@@ -16,7 +16,7 @@ import java.util.List;
 public class StatusOverlay {
 
     private static final ResourceLocation ICONS = TeamsHUD.id("textures/gui/hudicons.png");
-    private static final int OVERLAY_WIDTH = 80;
+    private static final int OVERLAY_WIDTH = 100; // Increased from 80 to accommodate distance text
     private static final int OVERLAY_HEIGHT_PER_PLAYER = 46;
 
     public boolean enabled = true;
@@ -136,8 +136,23 @@ public class StatusOverlay {
         graphics.blit(teammate.skin, 2 * (posX + 4), 2 * posY + 8, 32, 32, 32, 32);
         graphics.pose().popPose();
 
-        // Draw name
-        graphics.drawString(client.font, Component.literal(teammate.name), posX + 20, posY - 15, ChatFormatting.WHITE.getColor());
+        // Draw name with optional distance
+        String nameText = teammate.name;
+        if (Services.PLATFORM.getConfig().showTeammateDistance() && teammate.getDistance() >= 0) {
+            boolean showDistance = true;
+            
+            // If config requires compass range check, verify teammate is within range
+            if (Services.PLATFORM.getConfig().distanceOnlyWithinCompassRange()) {
+                int compassDetectionDistance = Services.PLATFORM.getConfig().compassDetectionDistance();
+                showDistance = teammate.getDistance() <= compassDetectionDistance;
+            }
+            
+            if (showDistance) {
+                int distance = (int) Math.round(teammate.getDistance());
+                nameText = teammate.name + " - " + distance + "m";
+            }
+        }
+        graphics.drawString(client.font, Component.literal(nameText), posX + 20, posY - 15, ChatFormatting.WHITE.getColor());
 
         // Update count & offset
         offsetY += 46;
