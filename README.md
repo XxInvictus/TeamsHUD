@@ -135,6 +135,7 @@ This project is licensed under the C0-1.0 License.
 
 ## Authors
 
+- XxInvictus
 - Tfarcenim [https://www.curseforge.com/minecraft/mc-mods/teams-hud](TeamsHUD)
 - CommodoreThrawn [https://www.curseforge.com/minecraft/mc-mods/teams](Teams)
 
