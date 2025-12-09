@@ -10,33 +10,33 @@ import net.minecraft.network.chat.MutableComponent;
 public class ModComponents {
 
     /** Create team menu title */
-    public static final Component CREATE_TITLE = translatable("teams.menu.create.title");
+    public static final Component CREATE_TITLE = translatable("teamshudplus.menu.create.title");
     /** Lonely player menu title */
-    public static final Component LONELY_MENU_TITLE = translatable("teams.menu.lonely.title");
+    public static final Component LONELY_MENU_TITLE = translatable("teamshudplus.menu.lonely.title");
     /** Create team instruction text */
-    public static final Component CREATE_TEXT2 = translatable("teams.menu.create.text");
+    public static final Component CREATE_TEXT2 = translatable("teamshudplus.menu.create.text");
     /** Invite player button text */
-    public static final Component INVITE_TEXT = translatable("teams.menu.invite");
+    public static final Component INVITE_TEXT = translatable("teamshudplus.menu.invite");
     /** Leave team button text */
-    public static final Component LEAVE_TEXT = translatable("teams.menu.leave");
+    public static final Component LEAVE_TEXT = translatable("teamshudplus.menu.leave");
     /** Go back button text */
-    public static final Component GO_BACK_TEXT = translatable("teams.menu.return");
+    public static final Component GO_BACK_TEXT = translatable("teamshudplus.menu.return");
     /** Teams menu title */
-    public static final Component TEAMS_MENU_TITLE = translatable("teams.menu.title");
+    public static final Component TEAMS_MENU_TITLE = translatable("teamshudplus.menu.title");
     /** Default input field text */
-    public static final Component DEFAULT_TEXT = translatable("teams.menu.input");
+    public static final Component DEFAULT_TEXT = translatable("teamshudplus.menu.input");
     /** Create team button text */
-    public static final Component CREATE_TEXT = translatable("teams.menu.create");
+    public static final Component CREATE_TEXT = translatable("teamshudplus.menu.create");
     /** Lonely player message text */
-    public static final Component LONELY_TEXT = translatable("teams.menu.lonely.alone");
+    public static final Component LONELY_TEXT = translatable("teamshudplus.menu.lonely.alone");
     /** Duplicate team error message */
-    public static final Component DUPLICATE_TEAM = translatable("teams.error.duplicateteam");
+    public static final Component DUPLICATE_TEAM = translatable("teamshudplus.error.duplicateteam");
     /** Invite player menu title */
-    public static final Component INVITE_TITLE_TEXT = translatable("teams.menu.invite.title");
+    public static final Component INVITE_TITLE_TEXT = translatable("teamshudplus.menu.invite.title");
     /** Invite player instruction text */
-    public static final Component INVITE_TEXT2 = translatable("teams.menu.invite.text");
+    public static final Component INVITE_TEXT2 = translatable("teamshudplus.menu.invite.text");
     /** Toggle HUD lock button text */
-    public static final Component TOGGLE_HUD_LOCK_TEXT = translatable("teams.menu.toggle_hud_lock");
+    public static final Component TOGGLE_HUD_LOCK_TEXT = translatable("teamshudplus.menu.toggle_hud_lock");
 
     /**
      * Creates a translatable component from a language key

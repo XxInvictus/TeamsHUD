@@ -27,6 +27,6 @@ public class ToastRequested extends RespondableTeamToast {
 
     @Override
     public String title() {
-        return I18n.get("teams.toast.requested", name);
+        return I18n.get("teamshudplus.toast.requested", name);
     }
 }

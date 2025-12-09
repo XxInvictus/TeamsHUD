@@ -444,9 +444,10 @@ jobs:
             forge
           game-versions: ${{ needs.build.outputs.minecraft_version }}
           
-          # Dependencies - @fabric suffix ensures Fabric API only required for Fabric loader
+          # Dependencies - @fabric suffix ensures these are only required for Fabric loader
           dependencies: |
             fabric-api(required){modrinth:P7dR8mSH}{curseforge:306612}@fabric
+            cloth-config(required){modrinth:9s6osm5g}{curseforge:348521}@fabric
           
           # Files to publish - both JARs, mc-publish auto-detects loader from filename
           files: |
