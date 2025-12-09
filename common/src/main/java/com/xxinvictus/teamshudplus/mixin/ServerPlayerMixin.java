@@ -31,11 +31,6 @@ public abstract class ServerPlayerMixin extends Player implements IHasTeam {
 	/** Shadowed game mode field */
 	@Shadow @Final public ServerPlayerGameMode gameMode;
 
-	/** Shadowed server level accessor 
-	 * @return The server level
-	 */
-	@Shadow public abstract ServerLevel serverLevel();
-
 	/** The team this player is in */
 	@Unique
 	private ModTeam team;
@@ -101,7 +96,7 @@ public abstract class ServerPlayerMixin extends Player implements IHasTeam {
 	@Inject(at = @At(value = "TAIL"), method = "readAdditionalSaveData")
 	private void readCustomDataFromNbt(CompoundTag nbt, CallbackInfo info) {
 		if (team == null && nbt.contains("playerTeam")) {
-			team = TeamDB.getOrMakeDefault(this.serverLevel().getServer()).getTeam(nbt.getString("playerTeam"));
+			team = TeamDB.getOrMakeDefault(((ServerLevel) this.level()).getServer()).getTeam(nbt.getString("playerTeam"));
 			if (team == null || !team.hasPlayer(getUUID())) {
 				team = null;
 			}
