@@ -111,13 +111,18 @@ jobs:
         env:
           GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: dev
       
+      - name: Prepare Artifacts for Upload
+        run: |
+          mkdir -p artifacts
+          cp fabric/build/libs/*-fabric-*.jar artifacts/ || true
+          cp forge/build/libs/*-forge-*.jar artifacts/ || true
+          ls -la artifacts/
+      
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: |
-            fabric/build/libs/*-fabric-*.jar
-            forge/build/libs/*-forge-*.jar
+          path: artifacts/*.jar
           retention-days: 3
       
       - name: Upload Properties for Next Stages
@@ -172,8 +177,12 @@ jobs:
       
       - name: Prepare Test Environment
         run: |
+          echo "Downloaded artifacts:"
+          ls -la build/libs/
           mkdir -p run/mods
           cp build/libs/*-fabric-*.jar run/mods/
+          echo "Mods directory:"
+          ls -la run/mods/
       
       - name: Run Fabric Client Test
         uses: headlesshq/mc-runtime-test@4.1.0
@@ -229,8 +238,12 @@ jobs:
       
       - name: Prepare Test Environment
         run: |
+          echo "Downloaded artifacts:"
+          ls -la build/libs/
           mkdir -p run/mods
           cp build/libs/*-fabric-*.jar run/mods/
+          echo "Mods directory:"
+          ls -la run/mods/
       
       - name: Run Fabric Server Test
         uses: headlesshq/mc-runtime-test@4.1.0
@@ -286,8 +299,12 @@ jobs:
       
       - name: Prepare Test Environment
         run: |
+          echo "Downloaded artifacts:"
+          ls -la build/libs/
           mkdir -p run/mods
           cp build/libs/*-forge-*.jar run/mods/
+          echo "Mods directory:"
+          ls -la run/mods/
       
       - name: Run Forge Client Test
         uses: headlesshq/mc-runtime-test@4.1.0
@@ -343,8 +360,12 @@ jobs:
       
       - name: Prepare Test Environment
         run: |
+          echo "Downloaded artifacts:"
+          ls -la build/libs/
           mkdir -p run/mods
           cp build/libs/*-forge-*.jar run/mods/
+          echo "Mods directory:"
+          ls -la run/mods/
       
       - name: Run Forge Server Test
         uses: headlesshq/mc-runtime-test@4.1.0
