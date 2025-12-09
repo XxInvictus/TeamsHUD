@@ -1,6 +1,6 @@
-# TeamsHUD
+# TeamsHUDPlus
 
-A Minecraft mod that adds team management functionality with visual HUD elements for both Forge and Fabric mod loaders.
+A Minecraft mod that adds team management functionality with visual HUD elements for both Forge and Fabric mod loaders. Continuation of the work by Tfarcenim (TeamsHUD) and CommodoreThrawn (Teams) with additional functionality I wish they had. I have raised Pull Requests against the TeamsHUD source for these features and may still scrap this continuation if they get accepted and merged into that mod.
 
 ## Features
 
@@ -135,8 +135,8 @@ This project is licensed under the C0-1.0 License.
 
 ## Authors
 
-- Tfarcenim
-- CommodoreThrawn
+- Tfarcenim [https://www.curseforge.com/minecraft/mc-mods/teams-hud](TeamsHUD)
+- CommodoreThrawn [https://www.curseforge.com/minecraft/mc-mods/teams](Teams)
 
 ## Development
 

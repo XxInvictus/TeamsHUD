@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.xxinvictus.teamshudplus.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "AdvancementMixinFabric"
+  ],
+  "client": [
+    "TabHudMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
