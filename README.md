@@ -56,8 +56,8 @@ A Minecraft mod that adds team management functionality with visual HUD elements
 ### Prerequisites
 - Minecraft 1.20.1
 - Java 17 or higher
-- **Forge**: Version 47.1.3 or higher
-- **Fabric**: Fabric Loader 0.15.0+ and Fabric API 0.90.0+
+- **Forge**: Version 47.4.0 or higher
+- **Fabric**: Fabric Loader 0.18.1+ and Fabric API 0.92.6+
 
 ### Steps
 1. Download the appropriate version for your mod loader (Forge or Fabric)
@@ -131,13 +131,17 @@ Built JARs will be located in:
 
 ## License
 
-This project is licensed under the C0-1.0 License.
+This project is licensed under the GNU Affero General Public License v3.0 - see the [LICENSE.md](LICENSE.md) file for details.
 
 ## Authors
 
-- XxInvictus
-- Tfarcenim [https://www.curseforge.com/minecraft/mc-mods/teams-hud](TeamsHUD)
-- CommodoreThrawn [https://www.curseforge.com/minecraft/mc-mods/teams](Teams)
+- XxInvictus (TeamsHUDPlus)
+- Tfarcenim ([TeamsHUD](https://www.curseforge.com/minecraft/mc-mods/teams-hud))
+- CommodoreThrawn ([Teams](https://www.curseforge.com/minecraft/mc-mods/teams))
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a detailed version history.
 
 ## Development
 
