@@ -19,6 +19,11 @@ dependencies {
      implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
 }
 
+tasks.named("compileJava", JavaCompile).configure {
+    outputs.file(layout.buildDirectory.file("tmp/compileJava/${mod_id}.refmap.json"))
+    outputs.file(layout.buildDirectory.file("tmp/compileJava/compileJava-refmap.json"))
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {

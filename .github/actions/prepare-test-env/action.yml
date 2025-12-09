@@ -1,0 +1,67 @@
+name: Prepare Test Environment
+description: Checkout repo, download build artifacts and gradle properties, set up Java, and extract requested properties.
+inputs:
+  artifact-name:
+    description: Name of the build artifact to download.
+    default: build-artifacts
+  artifact-path:
+    description: Path where the build artifact should be placed.
+    default: build/libs
+  properties-artifact-name:
+    description: Name of the gradle properties artifact to download.
+    default: gradle-properties
+  properties-destination:
+    description: Destination directory for gradle.properties.
+    default: .
+  java-version:
+    description: Java version to install with Temurin.
+    default: '17'
+  property-preset:
+    description: extract-properties preset to use.
+    required: true
+outputs:
+  minecraft_version:
+    value: ${{ steps.extract.outputs.minecraft_version }}
+  mod_version:
+    value: ${{ steps.extract.outputs.mod_version }}
+  mod_name:
+    value: ${{ steps.extract.outputs.mod_name }}
+  mod_id:
+    value: ${{ steps.extract.outputs.mod_id }}
+  fabric_loader_version:
+    value: ${{ steps.extract.outputs.fabric_loader_version }}
+  fabric_version:
+    value: ${{ steps.extract.outputs.fabric_version }}
+  cloth_config_version:
+    value: ${{ steps.extract.outputs.cloth_config_version }}
+  forge_version:
+    value: ${{ steps.extract.outputs.forge_version }}
+  full_version:
+    value: ${{ steps.extract.outputs.full_version }}
+runs:
+  using: composite
+  steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.artifact-path }}
+
+    - name: Download Gradle Properties
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ inputs.properties-artifact-name }}
+        path: ${{ inputs.properties-destination }}
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: ${{ inputs.java-version }}
+
+    - id: extract
+      shell: bash
+      run: bash .github/scripts/extract-properties.sh --preset ${{ inputs.property-preset }}

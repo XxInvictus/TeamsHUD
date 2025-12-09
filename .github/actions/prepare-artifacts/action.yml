@@ -1,0 +1,55 @@
+name: Prepare Release/Publish Artifacts
+description: Checkout repo, restore cached artifacts, download fallbacks, and optionally install Java.
+inputs:
+  cache-path:
+    description: Path(s) to restore from cache.
+    required: true
+  cache-key:
+    description: Primary cache key.
+    required: true
+  restore-keys:
+    description: Additional cache restore keys (newline delimited).
+    default: ''
+  fail-on-cache-miss:
+    description: Whether cache restore should fail when cache is missing.
+    default: 'false'
+  artifact-name:
+    description: Artifact to download if cache misses.
+    required: true
+  artifact-path:
+    description: Destination for downloaded artifact fallback.
+    required: true
+  java-version:
+    description: Java version to install. Leave empty to skip.
+    default: ''
+outputs:
+  cache-hit:
+    value: ${{ steps.restore.outputs.cache-hit }}
+runs:
+  using: composite
+  steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - id: restore
+      name: Restore Cached Artifacts
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ inputs.cache-path }}
+        key: ${{ inputs.cache-key }}
+        restore-keys: ${{ inputs.restore-keys }}
+        fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
+
+    - name: Download Build Artifacts (Fallback)
+      if: ${{ steps.restore.outputs.cache-hit != 'true' }}
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.artifact-path }}
+
+    - name: Setup Java
+      if: ${{ inputs.java-version != '' }}
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: ${{ inputs.java-version }}
