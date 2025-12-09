@@ -34,4 +34,9 @@ public interface MultiloaderConfig {
     void setCompassOverlayY(int y);
     void setStatusOverlayScale(float scale);
     void setCompassOverlayScale(float scale);
+    
+    // Distance counter feature
+    boolean showTeammateDistance();
+    int teammateDistanceUpdateFrequency();
+    boolean distanceOnlyWithinCompassRange();
 }

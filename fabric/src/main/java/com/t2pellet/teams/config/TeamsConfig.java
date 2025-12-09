@@ -65,6 +65,16 @@ public class TeamsConfig implements ConfigData, MultiloaderConfig {
     @Comment("Scale of the compass overlay (1.0 = default, 0.1 = 10%, 2.0 = 200%)")
     public float compassOverlayScale = 1.0f;
 
+    @ConfigEntry.Category("Distance Counter")
+    @Comment("Show distance to teammates next to their names")
+    public boolean showTeammateDistance = false;
+    @ConfigEntry.Category("Distance Counter")
+    @Comment("How often to update teammate distances (in ticks). Higher = less overhead, lower = more accurate. Default: 20 (1 second)")
+    public int teammateDistanceUpdateFrequency = 20;
+    @ConfigEntry.Category("Distance Counter")
+    @Comment("Only show distance when teammate is within compass detection range. Requires showTeammateDistance to be true.")
+    public boolean distanceOnlyWithinCompassRange = false;
+
     @Override
     public boolean showInvisibleTeammates() {
         return showInvisibleTeammates;
@@ -188,5 +198,20 @@ public class TeamsConfig implements ConfigData, MultiloaderConfig {
     @Override
     public void setCompassOverlayScale(float scale) {
         this.compassOverlayScale = scale;
+    }
+
+    @Override
+    public boolean showTeammateDistance() {
+        return showTeammateDistance;
+    }
+
+    @Override
+    public int teammateDistanceUpdateFrequency() {
+        return teammateDistanceUpdateFrequency;
+    }
+
+    @Override
+    public boolean distanceOnlyWithinCompassRange() {
+        return distanceOnlyWithinCompassRange;
     }
 }

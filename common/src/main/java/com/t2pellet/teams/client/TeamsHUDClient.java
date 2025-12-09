@@ -79,6 +79,9 @@ public class TeamsHUDClient {
                 key.onPress.execute(Minecraft.getInstance());
             }
         }
+        
+        // Update teammate distances
+        com.t2pellet.teams.client.core.TeammateDistanceTracker.tick();
     }
     
     public static boolean onMouseClick(double mouseX, double mouseY, int button) {
