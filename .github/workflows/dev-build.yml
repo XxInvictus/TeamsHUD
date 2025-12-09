@@ -114,8 +114,8 @@ jobs:
       - name: Prepare Artifacts for Upload
         run: |
           mkdir -p artifacts
-          cp fabric/build/libs/*-fabric-*.jar artifacts/ || true
-          cp forge/build/libs/*-forge-*.jar artifacts/ || true
+          find fabric/build/libs -name '*-fabric-*.jar' ! -name '*-javadoc.jar' ! -name '*-sources.jar' -exec cp {} artifacts/ \; || true
+          find forge/build/libs -name '*-forge-*.jar' ! -name '*-javadoc.jar' ! -name '*-sources.jar' -exec cp {} artifacts/ \; || true
           ls -la artifacts/
       
       - name: Upload Build Artifacts
@@ -189,7 +189,7 @@ jobs:
         run: |
           echo "Downloaded artifacts:"
           ls -la build/libs/
-          cp build/libs/*-fabric-*.jar run/mods/
+          find build/libs -name '*-fabric-*.jar' ! -name '*-javadoc.jar' ! -name '*-sources.jar' -exec cp {} run/mods/ \;
           echo "Mods directory:"
           ls -la run/mods/
       
@@ -259,7 +259,7 @@ jobs:
         run: |
           echo "Downloaded artifacts:"
           ls -la build/libs/
-          cp build/libs/*-fabric-*.jar run/mods/
+          find build/libs -name '*-fabric-*.jar' ! -name '*-javadoc.jar' ! -name '*-sources.jar' -exec cp {} run/mods/ \;
           echo "Mods directory:"
           ls -la run/mods/
       
@@ -320,7 +320,7 @@ jobs:
           echo "Downloaded artifacts:"
           ls -la build/libs/
           mkdir -p run/mods
-          cp build/libs/*-forge-*.jar run/mods/
+          find build/libs -name '*-forge-*.jar' ! -name '*-javadoc.jar' ! -name '*-sources.jar' -exec cp {} run/mods/ \;
           echo "Mods directory:"
           ls -la run/mods/
       
@@ -381,7 +381,7 @@ jobs:
           echo "Downloaded artifacts:"
           ls -la build/libs/
           mkdir -p run/mods
-          cp build/libs/*-forge-*.jar run/mods/
+          find build/libs -name '*-forge-*.jar' ! -name '*-javadoc.jar' ! -name '*-sources.jar' -exec cp {} run/mods/ \;
           echo "Mods directory:"
           ls -la run/mods/
       
