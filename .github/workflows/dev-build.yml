@@ -215,7 +215,7 @@ jobs:
           cloth_api_url="https://api.modrinth.com/v2/project/9s6osm5g/version?loaders=%5B%22fabric%22%5D&game_versions=%5B%22${minecraft_version}%22%5D"
           cloth_data=$(curl -sS "$cloth_api_url") || true
           
-          cloth_file_url=$(printf '%s' "$cloth_data" | jq -r --arg cloth "${cloth_config_version}" '([(.[] | select(.version_number == ($cloth + "+fabric")) | .files[0].url), (.[] | select(.version_number | startswith($cloth)) | .files[0].url)] | map(select(.!=null)) | .[0])')
+          cloth_file_url=$(printf '%s' "$cloth_data" | jq -r --arg cloth "${cloth_config_version}+fabric" '([(.[] | select(.version_number == $cloth) | .files[0].url), (.[] | select(.version_number | startswith($cloth)) | .files[0].url)] | map(select(.!=null)) | .[0])')
           
           if [ -z "$cloth_file_url" ] || [ "$cloth_file_url" = "null" ]; then
             echo "Error: Could not find Cloth Config version ${cloth_config_version} for Minecraft ${minecraft_version}"
