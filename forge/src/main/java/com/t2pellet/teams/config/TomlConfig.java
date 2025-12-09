@@ -5,6 +5,10 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.world.scores.Team;
 import net.minecraftforge.common.ForgeConfigSpec;
 
+/**
+ * Forge configuration implementation using ForgeConfigSpec.
+ * Contains all mod settings for team defaults, visual options, HUD positioning, and distance tracking.
+ */
 public class TomlConfig implements MultiloaderConfig {
 
     @Override
@@ -147,16 +151,31 @@ public class TomlConfig implements MultiloaderConfig {
         return Client.distanceOnlyWithinCompassRange.get();
     }
 
+    /**
+     * Server-side configuration settings.
+     */
     public static class Server {
+        /** Whether teammates should see each other when invisible */
         public static ForgeConfigSpec.BooleanValue showInvisibleTeammates;
+        /** Whether friendly fire is enabled between teammates */
         public static ForgeConfigSpec.BooleanValue friendlyFireEnabled;
+        /** Visibility setting for team name tags */
         public static ForgeConfigSpec.EnumValue<Team.Visibility> nameTagVisibility;
+        /** Team color formatting */
         public static ForgeConfigSpec.EnumValue<ChatFormatting> colour;
+        /** Visibility setting for death messages */
         public static ForgeConfigSpec.EnumValue<Team.Visibility> deathMessageVisibility;
+        /** Collision rule for team members */
         public static ForgeConfigSpec.ConfigValue<Team.CollisionRule> collisionRule;
+        /** Whether to sync advancements between team members */
         public static ForgeConfigSpec.BooleanValue syncAdvancements;
+        /** Server-enforced maximum compass detection distance */
         public static ForgeConfigSpec.IntValue maxCompassDetectionDistance;
 
+        /**
+         * Initializes server-side configuration.
+         * @param builder The config spec builder
+         */
         public Server(ForgeConfigSpec.Builder builder) {
             builder.push("general");
             showInvisibleTeammates = builder.define("show_invisible_teammates",true);
@@ -171,22 +190,43 @@ public class TomlConfig implements MultiloaderConfig {
         }
     }
 
+    /**
+     * Client-side configuration settings.
+     */
     public static class Client {
+        /** Whether compass HUD is enabled */
         public static ForgeConfigSpec.BooleanValue enableCompassHUD;
+        /** Whether status HUD is enabled */
         public static ForgeConfigSpec.BooleanValue enableStatusHUD;
+        /** Toast notification duration in seconds */
         public static ForgeConfigSpec.IntValue toastDuration;
+        /** Whether to show teammate hunger bars */
         public static ForgeConfigSpec.BooleanValue showHunger;
+        /** Maximum compass detection distance */
         public static ForgeConfigSpec.IntValue compassDetectionDistance;
+        /** Status overlay X position */
         public static ForgeConfigSpec.IntValue statusOverlayX;
+        /** Status overlay Y position */
         public static ForgeConfigSpec.IntValue statusOverlayY;
+        /** Compass overlay X position */
         public static ForgeConfigSpec.IntValue compassOverlayX;
+        /** Compass overlay Y position */
         public static ForgeConfigSpec.IntValue compassOverlayY;
+        /** Status overlay scale factor */
         public static ForgeConfigSpec.DoubleValue statusOverlayScale;
+        /** Compass overlay scale factor */
         public static ForgeConfigSpec.DoubleValue compassOverlayScale;
+        /** Whether to show distance to teammates */
         public static ForgeConfigSpec.BooleanValue showTeammateDistance;
+        /** Distance update frequency in ticks */
         public static ForgeConfigSpec.IntValue teammateDistanceUpdateFrequency;
+        /** Whether distance is only shown within compass range */
         public static ForgeConfigSpec.BooleanValue distanceOnlyWithinCompassRange;
 
+        /**
+         * Initializes client-side configuration.
+         * @param builder The config spec builder
+         */
         public Client(ForgeConfigSpec.Builder builder) {
             builder.push("visual");
             enableCompassHUD = builder.define("enable_compass_hud",true);

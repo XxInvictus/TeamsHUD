@@ -19,6 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+/**
+ * Database for managing all teams on the server.
+ * Extends {@link SavedData} to persist team data across server restarts.
+ * Handles team creation, deletion, player membership, and NBT serialization.
+ */
 public class TeamDB extends SavedData {
 
     private static final String TEAMS_KEY = "teams";
@@ -38,10 +43,19 @@ public class TeamDB extends SavedData {
         return compoundTag;
     }
 
+    /**
+     * Gets a stream of all teams in the database.
+     * @return Stream of all ModTeam instances
+     */
     public Stream<ModTeam> getTeams() {
         return teams.values().stream();
     }
 
+    /**
+     * Adds an existing team to the database and syncs to all clients.
+     * @param team The team to add
+     * @throws ModTeam.TeamException if a team with the same name already exists
+     */
     public void addTeam(ModTeam team) throws ModTeam.TeamException {
         if (teams.containsKey(team.getName())) {
             throw new ModTeam.TeamException(ModComponents.DUPLICATE_TEAM);
@@ -52,6 +66,14 @@ public class TeamDB extends SavedData {
         setDirty();
     }
 
+    /**
+     * Creates a new team with the given name and optional creator.
+     * If a creator is provided, they are automatically added to the team.
+     * @param name The name of the team to create
+     * @param creator The player creating the team, or null if created by command/system
+     * @return The newly created ModTeam
+     * @throws ModTeam.TeamException if the name is invalid or creator is already in a team
+     */
     public ModTeam addTeam(String name, @Nullable ServerPlayer creator) throws ModTeam.TeamException {
         if (name == null || name.trim().isEmpty()) {
             throw new ModTeam.TeamException(ModComponents.translatable("teams.error.invalidname"));
@@ -70,6 +92,10 @@ public class TeamDB extends SavedData {
         return team;
     }
 
+    /**
+     * Removes a team from the database, clears all players, and syncs to clients.
+     * @param team The team to remove
+     */
     public void removeTeam(ModTeam team) {
         teams.remove(team.getName());
         MinecraftServer server = serverLevel.getServer();
@@ -80,22 +106,47 @@ public class TeamDB extends SavedData {
         setDirty();
     }
 
+    /**
+     * Checks if the database has no teams.
+     * @return true if there are no teams
+     */
     public boolean isEmpty() {
         return teams.isEmpty();
     }
 
+    /**
+     * Checks if a team with the given name exists.
+     * @param team The team name to check
+     * @return true if the team exists
+     */
     public boolean hasTeam(String team) {
         return teams.containsKey(team);
     }
 
+    /**
+     * Gets the team that a player is currently in.
+     * @param player The player to check
+     * @return The player's team, or null if not in a team
+     */
     public ModTeam getTeam(ServerPlayer player) {
         return ((IHasTeam) player).getTeam();
     }
 
+    /**
+     * Gets a team by its name.
+     * @param name The team name
+     * @return The team, or null if not found
+     */
     public ModTeam getTeam(String name) {
         return teams.get(name);
     }
 
+    /**
+     * Sends a team invitation to a player.
+     * @param player The player to invite
+     * @param team The team to invite them to
+     * @throws ModTeam.TeamException if the player is already in a team
+     */
     public void invitePlayerToTeam(ServerPlayer player, ModTeam team) throws ModTeam.TeamException {
         if (((IHasTeam) player).hasTeam()) {
             throw new ModTeam.TeamException(ModComponents.translatable("teams.error.alreadyinteam", player.getName().getString()));
@@ -103,6 +154,12 @@ public class TeamDB extends SavedData {
         Services.PLATFORM.sendToClient(new S2CTeamInvitedPacket(team), player);
     }
 
+    /**
+     * Adds a player to a team.
+     * @param player The player to add
+     * @param team The team to add them to
+     * @throws ModTeam.TeamException if the player is already in a team
+     */
     public void addPlayerToTeam(ServerPlayer player, ModTeam team) throws ModTeam.TeamException {
         if (((IHasTeam) player).hasTeam()) {
             throw new ModTeam.TeamException(ModComponents.translatable("teams.error.alreadyinteam", player.getName()));
@@ -110,6 +167,11 @@ public class TeamDB extends SavedData {
         team.addPlayer(player);
     }
 
+    /**
+     * Removes a player from their current team. If the team becomes empty, it is deleted.
+     * @param player The player to remove
+     * @throws ModTeam.TeamException if the player is not in a team
+     */
     public void removePlayerFromTeam(ServerPlayer player) throws ModTeam.TeamException {
         ModTeam playerTeam = ((IHasTeam) player).getTeam();
         if (playerTeam == null) {
@@ -121,6 +183,10 @@ public class TeamDB extends SavedData {
         }
     }
 
+    /**
+     * Deserializes team data from NBT.
+     * @param compound The NBT tag containing team data
+     */
     public void fromNBT(CompoundTag compound) {
         teams.clear();
         ListTag list = compound.getList(TEAMS_KEY, Tag.TAG_COMPOUND);
@@ -133,6 +199,10 @@ public class TeamDB extends SavedData {
         }
     }
 
+    /**
+     * Serializes all teams to NBT.
+     * @param compound The NBT tag to write to
+     */
     public void toNBT(CompoundTag compound) {
         ListTag list = new ListTag();
         for (var team : teams.values()) {
@@ -141,22 +211,41 @@ public class TeamDB extends SavedData {
         compound.put(TEAMS_KEY, list);
     }
 
-
+    /**
+     * Gets the TeamDB for a server level if it exists.
+     * @param serverLevel The server level
+     * @return The TeamDB, or null if not found
+     */
     static TeamDB get(ServerLevel serverLevel) {
         return serverLevel.getDataStorage()
                 .get(compoundTag -> loadStatic(compoundTag, serverLevel),TEAMS_KEY);
     }
 
-
+    /**
+     * Gets or creates the TeamDB for a server level.
+     * @param serverLevel The server level
+     * @return The TeamDB instance
+     */
     static TeamDB getOrMake(ServerLevel serverLevel) {
         return serverLevel.getDataStorage()
                 .computeIfAbsent(compoundTag -> loadStatic(compoundTag,serverLevel), () -> new TeamDB(serverLevel), TEAMS_KEY);
     }
 
+    /**
+     * Gets or creates the default TeamDB for the server (overworld).
+     * @param server The Minecraft server
+     * @return The default TeamDB instance
+     */
     public static TeamDB getOrMakeDefault(MinecraftServer server) {
         return getOrMake(server.overworld());
     }
 
+    /**
+     * Loads a TeamDB from NBT data.
+     * @param compoundTag The NBT data
+     * @param level The server level
+     * @return The loaded TeamDB instance
+     */
     public static TeamDB loadStatic(CompoundTag compoundTag,ServerLevel level) {
         TeamDB id = new TeamDB(level);
         id.fromNBT(compoundTag);

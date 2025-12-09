@@ -8,6 +8,9 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.Minecraft;
 
+/**
+ * Fabric client-side initialization and event handling.
+ */
 public class TeamsHUDClientFabric implements ClientModInitializer {
 
     private static boolean wasMousePressed = false;

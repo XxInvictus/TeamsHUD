@@ -10,13 +10,22 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
+/**
+ * Forge client-side initialization and event handling.
+ */
 public class TeamsHUDClientForge {
 
     private static boolean wasMousePressed = false;
 
+    /** Forge overlay for compass HUD */
     public static final IGuiOverlay compass = (gui, graphics, partialTick, width, height) -> TeamsHUDClient.compass.render(graphics);
+    /** Forge overlay for status HUD */
     public static final IGuiOverlay status = (gui, graphics, partialTick, width, height) -> TeamsHUDClient.status.render(graphics);
 
+    /**
+     * Initializes Forge client-side event listeners.
+     * @param bus The mod event bus
+     */
     public static void init(IEventBus bus) {
         bus.addListener(TeamsHUDClientForge::setup);
         bus.addListener(TeamsHUDClientForge::registerOverlays);

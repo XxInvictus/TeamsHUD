@@ -10,10 +10,18 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 import java.util.function.Function;
 
+/**
+ * Fabric server-side packet handler for processing client-to-server packets.
+ * @param <MSG> The packet type extending C2SModPacket
+ */
 public class ServerHandler<MSG extends C2SModPacket> implements ServerPlayNetworking.PlayChannelHandler {
 
     private final Function<FriendlyByteBuf, MSG> packetDecoder;
 
+    /**
+     * Creates a server handler with the given packet decoder.
+     * @param packetDecoder Function to decode packets from buffer
+     */
     public ServerHandler(Function<FriendlyByteBuf,MSG> packetDecoder) {
         this.packetDecoder = packetDecoder;
     }

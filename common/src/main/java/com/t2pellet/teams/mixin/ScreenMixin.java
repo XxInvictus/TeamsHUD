@@ -12,6 +12,10 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.List;
 
+/**
+ * Mixin for Screen to provide button addition functionality.
+ * Implements ScreenDuck interface to allow adding buttons programmatically.
+ */
 @Mixin(Screen.class)
 public abstract class ScreenMixin implements ScreenDuck {
 

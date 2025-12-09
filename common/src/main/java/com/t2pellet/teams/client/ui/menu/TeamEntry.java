@@ -15,18 +15,31 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 
+/**
+ * UI widget representing a team entry in the teams list.
+ * Displays team name and a join/request button.
+ */
 public class TeamEntry extends AbstractWidget {
 
+    /** Width of the entry widget */
     static final int WIDTH = 244;
+    /** Height of the entry widget */
     static final int HEIGHT = 24;
     private static final ResourceLocation TEXTURE = TeamsHUD.id("textures/gui/screen_background.png");
 
+    /** Button to request joining the team */
     public final ImageButton joinButton;
     private Minecraft client;
     private String team;
     private int x;
     private int y;
 
+    /**
+     * Creates a team entry widget.
+     * @param team The team name
+     * @param x The X position
+     * @param y The Y position
+     */
     public TeamEntry(String team, int x, int y) {
         super(x,y,WIDTH,HEIGHT, ModComponents.literal(team));
         this.client = Minecraft.getInstance();

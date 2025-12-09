@@ -8,6 +8,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
+/**
+ * Renders a compass-style HUD showing teammate positions and distances.
+ * Displays teammate heads around a compass overlay indicating their relative direction.
+ */
 public class CompassOverlay {
 
     private static final int HUD_WIDTH = 182;
@@ -20,41 +24,73 @@ public class CompassOverlay {
 
     static final ResourceLocation GUI_ICONS_LOCATION = new ResourceLocation("textures/gui/icons.png");
 
+    /** Whether the compass overlay is enabled */
     public boolean enabled = true;
     private final Minecraft client;
     private boolean isShowing = false;
     private int baseX = 0;
     private int baseY = 0;
 
+    /**
+     * Creates a new compass overlay
+     */
     public CompassOverlay() {
         this.client = Minecraft.getInstance();
     }
 
+    /**
+     * Checks if the compass is currently being shown
+     * @return true if the compass is visible
+     */
     public boolean isShowing() {
         return isShowing;
     }
     
+    /**
+     * Gets the base X coordinate of the compass
+     * @return The X coordinate
+     */
     public int getBaseX() {
         return baseX;
     }
     
+    /**
+     * Gets the base Y coordinate of the compass
+     * @return The Y coordinate
+     */
     public int getBaseY() {
         return baseY;
     }
     
+    /**
+     * Gets the width of the compass overlay
+     * @return The width in pixels
+     */
     public int getWidth() {
         return HUD_WIDTH;
     }
     
+    /**
+     * Gets the height of the compass overlay including space for player heads
+     * @return The height in pixels
+     */
     public int getHeight() {
         // Return unscaled height - scaling will be applied in hit detection
         return HUD_HEIGHT + 50; // Include space for heads
     }
     
+    /**
+     * Gets the scale factor for the compass overlay from config
+     * @return The scale factor
+     */
     public float getScale() {
         return Services.PLATFORM.getConfig().compassOverlayScale();
     }
 
+    /**
+     * Renders the compass overlay to the screen
+     * @param graphics The graphics context for rendering
+     */
     public void render(GuiGraphics graphics) {
         if (!Services.PLATFORM.getConfig().enableCompassHUD() || !enabled) {
             isShowing = false;

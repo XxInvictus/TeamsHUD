@@ -9,12 +9,22 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
+/**
+ * Main team screen shown when the player is in a team.
+ * Displays team members and management options.
+ */
 public class TeamsMainScreen extends TeamsScreen {
 
+    /** Width of the screen */
     static final int WIDTH = 256;
+    /** Height of the screen */
     static final int HEIGHT = 166;
     private static final ResourceLocation TEXTURE = new ResourceLocation(TeamsHUD.MODID, "textures/gui/screen_background.png");
 
+    /**
+     * Creates a main team screen.
+     * @param parent The parent screen
+     */
     public TeamsMainScreen(Screen parent) {
         super(parent, ModComponents.TEAMS_MENU_TITLE);
     }
@@ -71,6 +81,9 @@ public class TeamsMainScreen extends TeamsScreen {
         return TEXTURE;
     }
 
+    /**
+     * Refreshes this screen or returns to parent if team was left.
+     */
     public void refresh() {
         if (!ClientTeam.INSTANCE.isInTeam()) {
             minecraft.setScreen(parent);

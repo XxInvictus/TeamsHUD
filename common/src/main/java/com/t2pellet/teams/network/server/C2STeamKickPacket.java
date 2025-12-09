@@ -8,16 +8,29 @@ import net.minecraft.server.level.ServerPlayer;
 
 import java.util.UUID;
 
+/**
+ * Packet sent from client to server to kick a player from a team.
+ * The sender must have permissions to kick players from the team.
+ */
 public class C2STeamKickPacket implements C2SModPacket {
 
     String name;
     UUID toKick;
 
+    /**
+     * Creates a new team kick packet
+     * @param team The name of the team
+     * @param playerToKick The UUID of the player to kick
+     */
     public C2STeamKickPacket(String team, UUID playerToKick) {
         name = team;
         toKick = playerToKick;
     }
 
+    /**
+     * Decode a team kick packet from the network buffer
+     * @param byteBuf The buffer to read from
+     */
     public C2STeamKickPacket(FriendlyByteBuf byteBuf) {
         name = byteBuf.readUtf();
         toKick = byteBuf.readUUID();

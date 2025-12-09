@@ -9,14 +9,26 @@ import net.minecraft.server.level.ServerPlayer;
 
 import java.util.UUID;
 
+/**
+ * Packet sent from client to server to invite a player to the sender's team.
+ */
 public class C2STeamInvitePacket implements C2SModPacket {
 
 
     String to;
+    
+    /**
+     * Creates a new team invite packet
+     * @param to The username of the player to invite
+     */
     public C2STeamInvitePacket(String to) {
         this.to = to;
     }
 
+    /**
+     * Decode a team invite packet from the network buffer
+     * @param byteBuf The buffer to read from
+     */
     public C2STeamInvitePacket(FriendlyByteBuf byteBuf) {
         to = byteBuf.readUtf();
     }

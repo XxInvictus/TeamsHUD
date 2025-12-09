@@ -3,11 +3,21 @@ package com.t2pellet.teams.client.ui.hud;
 import com.t2pellet.teams.platform.Services;
 import net.minecraft.client.Minecraft;
 
+/**
+ * Manages dragging and repositioning of HUD overlay elements.
+ * Provides locking mechanism to prevent accidental moves during gameplay.
+ */
 public class HudDragManager {
     
+    /**
+     * Identifies which HUD element can be dragged
+     */
     public enum DragTarget {
+        /** No element being dragged */
         NONE,
+        /** Status overlay (health/hunger) */
         STATUS,
+        /** Compass overlay */
         COMPASS
     }
     
@@ -18,22 +28,46 @@ public class HudDragManager {
     private static int elementStartY = 0;
     private static boolean locked = true; // Runtime lock state, defaults to locked
     
+    /**
+     * Checks if HUD elements are locked from dragging
+     * @return true if locked
+     */
     public static boolean isLocked() {
         return locked;
     }
     
+    /**
+     * Toggles the lock state for HUD dragging
+     */
     public static void toggleLock() {
         locked = !locked;
     }
     
+    /**
+     * Checks if a drag operation is currently in progress
+     * @return true if dragging
+     */
     public static boolean isDragging() {
         return currentlyDragging != DragTarget.NONE;
     }
     
+    /**
+     * Gets the current drag target
+     * @return The drag target, or NONE if not dragging
+     */
     public static DragTarget getCurrentTarget() {
         return currentlyDragging;
     }
     
+    /**
+     * Starts a drag operation for a HUD element
+     * @param target The element to drag
+     * @param mouseX Current mouse X position
+     * @param mouseY Current mouse Y position
+     * @param elementX Element's current X position
+     * @param elementY Element's current Y position
+     * @return true if drag started successfully
+     */
     public static boolean startDrag(DragTarget target, int mouseX, int mouseY, int elementX, int elementY) {
         if (isLocked() || isDragging()) {
             return false;
@@ -47,6 +81,11 @@ public class HudDragManager {
         return true;
     }
     
+    /**
+     * Updates the position of the dragged element based on mouse movement
+     * @param mouseX Current mouse X position
+     * @param mouseY Current mouse Y position
+     */
     public static void updateDrag(int mouseX, int mouseY) {
         if (!isDragging()) {
             return;
@@ -78,18 +117,36 @@ public class HudDragManager {
         }
     }
     
+    /**
+     * Ends the current drag operation
+     */
     public static void endDrag() {
         if (isDragging()) {
             currentlyDragging = DragTarget.NONE;
         }
     }
     
+    /**
+     * Checks if the mouse is over a scaled rectangular area
+     * @param mouseX Mouse X position
+     * @param mouseY Mouse Y position
+     * @param x Area X position
+     * @param y Area Y position
+     * @param width Area width (before scaling)
+     * @param height Area height (before scaling)
+     * @param scale Scale factor
+     * @return true if mouse is within the scaled area
+     */
     public static boolean isMouseOver(int mouseX, int mouseY, int x, int y, int width, int height, float scale) {
         int scaledWidth = (int) (width * scale);
         int scaledHeight = (int) (height * scale);
         return mouseX >= x && mouseX <= x + scaledWidth && mouseY >= y && mouseY <= y + scaledHeight;
     }
     
+    /**
+     * Resets a HUD element to its default position
+     * @param target The element to reset
+     */
     public static void resetPosition(DragTarget target) {
         switch (target) {
             case STATUS -> {

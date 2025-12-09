@@ -10,19 +10,35 @@ import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.renderer.GameRenderer;
 
-
+/**
+ * Base class for team-related toast notifications.
+ * Displays team messages with a configurable duration.
+ */
 public abstract class TeamToast implements Toast {
 
+    /** The team name */
     public final String team;
     private boolean firstDraw = true;
     private long firstDrawTime;
 
+    /**
+     * Creates a team toast.
+     * @param team The team name
+     */
     public TeamToast(String team) {
         this.team = team;
     }
 
+    /**
+     * Gets the title text for this toast.
+     * @return The title string
+     */
     public abstract String title();
 
+    /**
+     * Gets the subtitle text for this toast.
+     * @return The subtitle string
+     */
     public abstract String subTitle();
 
     @Override

@@ -16,8 +16,13 @@ import net.minecraftforge.fml.loading.FMLLoader;
 
 import java.util.function.Function;
 
+/**
+ * Forge platform implementation of IPlatformHelper.
+ * Provides Forge-specific implementations for platform services.
+ */
 public class ForgePlatformHelper implements IPlatformHelper {
 
+    /** The configuration instance for Forge */
     protected final MultiloaderConfig config = new TomlConfig();
 
     @Override

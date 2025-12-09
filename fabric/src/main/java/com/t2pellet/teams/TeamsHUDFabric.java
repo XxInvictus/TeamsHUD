@@ -11,10 +11,18 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.level.ServerPlayer;
 
+/**
+ * Fabric platform entry point for TeamsHUD.
+ * Registers configs, event listeners, and initializes common code.
+ */
 public class TeamsHUDFabric implements ModInitializer {
 
 	private static TeamsConfig config;
 
+	/**
+	 * Gets the Fabric configuration instance.
+	 * @return The config instance
+	 */
 	public static TeamsConfig getConfig() {
 		return config;
 	}
