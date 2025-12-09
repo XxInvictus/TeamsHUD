@@ -1,0 +1,98 @@
+name: Clear Actions Cache
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "CLEAR" to confirm cache deletion'
+        required: true
+        type: string
+
+jobs:
+  clear-cache:
+    name: Clear All Caches
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: Validate Confirmation
+        run: |
+          if [ "${{ inputs.confirm }}" != "CLEAR" ]; then
+            echo "::error::Confirmation failed. You must type 'CLEAR' to proceed."
+            exit 1
+          fi
+          echo "Confirmation validated. Proceeding with cache deletion..."
+      
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Clear All Caches
+        run: |
+          echo "Fetching all cache keys..."
+          
+          # Get all cache keys using GitHub CLI
+          cache_keys=$(gh cache list --limit 1000 --json key --jq '.[].key' || echo "")
+          
+          if [ -z "$cache_keys" ]; then
+            echo "No caches found to delete."
+            exit 0
+          fi
+          
+          echo "Found caches to delete:"
+          echo "$cache_keys"
+          echo ""
+          
+          # Count total caches
+          total=$(echo "$cache_keys" | wc -l)
+          echo "Total caches to delete: $total"
+          echo ""
+          
+          # Delete each cache
+          deleted=0
+          failed=0
+          
+          while IFS= read -r key; do
+            if [ -n "$key" ]; then
+              echo "Deleting cache: $key"
+              if gh cache delete "$key" --confirm; then
+                deleted=$((deleted + 1))
+                echo "✓ Deleted successfully"
+              else
+                failed=$((failed + 1))
+                echo "✗ Failed to delete"
+              fi
+            fi
+          done <<< "$cache_keys"
+          
+          echo ""
+          echo "=========================================="
+          echo "Cache deletion summary:"
+          echo "  Total:   $total"
+          echo "  Deleted: $deleted"
+          echo "  Failed:  $failed"
+          echo "=========================================="
+          
+          if [ $failed -gt 0 ]; then
+            echo "::warning::Some caches failed to delete. They may have been already deleted or expired."
+          fi
+          
+          if [ $deleted -gt 0 ]; then
+            echo "::notice::Successfully deleted $deleted cache(s)."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Verify Cache Deletion
+        run: |
+          echo "Verifying remaining caches..."
+          remaining=$(gh cache list --limit 100 --json key --jq '.[].key' | wc -l || echo "0")
+          
+          if [ "$remaining" -eq 0 ]; then
+            echo "✓ All caches have been successfully cleared."
+          else
+            echo "⚠ $remaining cache(s) still remain."
+            echo "Remaining caches:"
+            gh cache list --limit 100 || true
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
