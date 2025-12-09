@@ -15,6 +15,7 @@ jobs:
   check-version:
     name: Check Version Updated
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     
     steps:
       - name: Checkout PR Branch

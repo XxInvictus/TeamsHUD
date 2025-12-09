@@ -54,6 +54,7 @@ jobs:
   build:
     name: Build Mod
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       minecraft_version: ${{ steps.properties.outputs.minecraft_version }}
       mod_version: ${{ steps.properties.outputs.mod_version }}
@@ -136,6 +137,7 @@ jobs:
     name: Test Fabric Client
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     if: |
       needs.build.result == 'success' && (
         (github.event_name != 'push' || github.ref == 'refs/heads/1.20.1-dev') ||
@@ -180,10 +182,29 @@ jobs:
       - name: Download Dependencies
         run: |
           mkdir -p run/mods
-          # Download Cloth Config
-          cloth_config_url="https://cdn.modrinth.com/data/9s6osm5g/versions/v${{ steps.properties.outputs.cloth_config_version }}-fabric/cloth-config-${{ steps.properties.outputs.cloth_config_version }}-fabric.jar"
-          echo "Downloading Cloth Config from ${cloth_config_url}"
-          curl -L -o "run/mods/cloth-config.jar" "${cloth_config_url}"
+          # Download Cloth Config using Modrinth API
+          echo "Fetching Cloth Config version info from Modrinth API..."
+          cloth_config_version="${{ steps.properties.outputs.cloth_config_version }}"
+          minecraft_version="${{ steps.properties.outputs.minecraft_version }}"
+          
+          # Query Modrinth API for the correct version
+          version_data=$(curl -s "https://api.modrinth.com/v2/project/9s6osm5g/version?loaders=[%22fabric%22]&game_versions=[%22${minecraft_version}%22]")
+          
+          # Find the matching version by cloth config version number
+          file_url=$(echo "$version_data" | jq -r ".[] | select(.version_number == \"${cloth_config_version}+fabric\") | .files[0].url")
+          
+          if [ -z "$file_url" ] || [ "$file_url" = "null" ]; then
+            echo "Failed to find exact version, trying without +fabric suffix..."
+            file_url=$(echo "$version_data" | jq -r ".[] | select(.version_number | startswith(\"${cloth_config_version}\")) | .files[0].url")
+          fi
+          
+          if [ -z "$file_url" ] || [ "$file_url" = "null" ]; then
+            echo "Error: Could not find Cloth Config version ${cloth_config_version} for Minecraft ${minecraft_version}"
+            exit 1
+          fi
+          
+          echo "Downloading Cloth Config from ${file_url}"
+          curl -L -o "run/mods/cloth-config.jar" "${file_url}"
       
       - name: Prepare Test Environment
         run: |
@@ -206,6 +227,7 @@ jobs:
     name: Test Fabric Server
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     if: |
       needs.build.result == 'success' && (
         (github.event_name != 'push' || github.ref == 'refs/heads/1.20.1-dev') ||
@@ -250,10 +272,29 @@ jobs:
       - name: Download Dependencies
         run: |
           mkdir -p run/mods
-          # Download Cloth Config
-          cloth_config_url="https://cdn.modrinth.com/data/9s6osm5g/versions/v${{ steps.properties.outputs.cloth_config_version }}-fabric/cloth-config-${{ steps.properties.outputs.cloth_config_version }}-fabric.jar"
-          echo "Downloading Cloth Config from ${cloth_config_url}"
-          curl -L -o "run/mods/cloth-config.jar" "${cloth_config_url}"
+          # Download Cloth Config using Modrinth API
+          echo "Fetching Cloth Config version info from Modrinth API..."
+          cloth_config_version="${{ steps.properties.outputs.cloth_config_version }}"
+          minecraft_version="${{ steps.properties.outputs.minecraft_version }}"
+          
+          # Query Modrinth API for the correct version
+          version_data=$(curl -s "https://api.modrinth.com/v2/project/9s6osm5g/version?loaders=[%22fabric%22]&game_versions=[%22${minecraft_version}%22]")
+          
+          # Find the matching version by cloth config version number
+          file_url=$(echo "$version_data" | jq -r ".[] | select(.version_number == \"${cloth_config_version}+fabric\") | .files[0].url")
+          
+          if [ -z "$file_url" ] || [ "$file_url" = "null" ]; then
+            echo "Failed to find exact version, trying without +fabric suffix..."
+            file_url=$(echo "$version_data" | jq -r ".[] | select(.version_number | startswith(\"${cloth_config_version}\")) | .files[0].url")
+          fi
+          
+          if [ -z "$file_url" ] || [ "$file_url" = "null" ]; then
+            echo "Error: Could not find Cloth Config version ${cloth_config_version} for Minecraft ${minecraft_version}"
+            exit 1
+          fi
+          
+          echo "Downloading Cloth Config from ${file_url}"
+          curl -L -o "run/mods/cloth-config.jar" "${file_url}"
       
       - name: Prepare Test Environment
         run: |
@@ -276,6 +317,7 @@ jobs:
     name: Test Forge Client
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     if: |
       needs.build.result == 'success' && (
         (github.event_name != 'push' || github.ref == 'refs/heads/1.20.1-dev') ||
@@ -337,6 +379,7 @@ jobs:
     name: Test Forge Server
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     if: |
       needs.build.result == 'success' && (
         (github.event_name != 'push' || github.ref == 'refs/heads/1.20.1-dev') ||
@@ -399,6 +442,7 @@ jobs:
     needs: [build, test-fabric-client, test-fabric-server, test-forge-client, test-forge-server]
     if: always()
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     
     steps:
       - name: Delete Build Artifacts

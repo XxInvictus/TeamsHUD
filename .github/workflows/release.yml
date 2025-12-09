@@ -69,6 +69,7 @@ jobs:
   build:
     name: Build & Tag Release
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       minecraft_version: ${{ steps.properties.outputs.minecraft_version }}
       mod_version: ${{ steps.properties.outputs.mod_version }}
@@ -323,6 +324,7 @@ jobs:
       (github.event_name == 'push' || 
        (github.event_name == 'workflow_dispatch' && inputs.dry_run != true && inputs.publish_github != false))
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     
     steps:
       - name: Checkout Repository
@@ -388,6 +390,7 @@ jobs:
        (github.event_name == 'workflow_dispatch' && inputs.dry_run != true && 
         (inputs.publish_modrinth != false || inputs.publish_curseforge != false || inputs.publish_github != false)))
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     
     steps:
       - name: Checkout Repository
@@ -476,6 +479,7 @@ jobs:
     needs: [build, release, publish]
     if: always() && (needs.publish.result == 'success' || needs.publish.result == 'failure')
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     
     steps:
       - name: Delete Build Artifacts
