@@ -45,6 +45,25 @@ public class TeamsConfig implements ConfigData, MultiloaderConfig {
     @ConfigEntry.Category("Visual")
     @Comment("Maximum detection distance for the compass HUD (in blocks)")
     public int compassDetectionDistance = 128;
+    
+    @ConfigEntry.Category("HUD Positioning")
+    @Comment("X position of the status overlay (-1 for default)")
+    public int statusOverlayX = -1;
+    @ConfigEntry.Category("HUD Positioning")
+    @Comment("Y position of the status overlay (-1 for default)")
+    public int statusOverlayY = -1;
+    @ConfigEntry.Category("HUD Positioning")
+    @Comment("X position of the compass overlay (-1 for default)")
+    public int compassOverlayX = -1;
+    @ConfigEntry.Category("HUD Positioning")
+    @Comment("Y position of the compass overlay (-1 for default)")
+    public int compassOverlayY = -1;
+    @ConfigEntry.Category("HUD Positioning")
+    @Comment("Scale of the status overlay (1.0 = default, 0.1 = 10%, 2.0 = 200%)")
+    public float statusOverlayScale = 1.0f;
+    @ConfigEntry.Category("HUD Positioning")
+    @Comment("Scale of the compass overlay (1.0 = default, 0.1 = 10%, 2.0 = 200%)")
+    public float compassOverlayScale = 1.0f;
 
     @Override
     public boolean showInvisibleTeammates() {
@@ -109,5 +128,65 @@ public class TeamsConfig implements ConfigData, MultiloaderConfig {
     @Override
     public int maxCompassDetectionDistance() {
         return maxCompassDetectionDistance;
+    }
+
+    @Override
+    public int statusOverlayX() {
+        return statusOverlayX;
+    }
+
+    @Override
+    public int statusOverlayY() {
+        return statusOverlayY;
+    }
+
+    @Override
+    public int compassOverlayX() {
+        return compassOverlayX;
+    }
+
+    @Override
+    public int compassOverlayY() {
+        return compassOverlayY;
+    }
+
+    @Override
+    public float statusOverlayScale() {
+        return statusOverlayScale;
+    }
+
+    @Override
+    public float compassOverlayScale() {
+        return compassOverlayScale;
+    }
+
+    @Override
+    public void setStatusOverlayX(int x) {
+        this.statusOverlayX = x;
+    }
+
+    @Override
+    public void setStatusOverlayY(int y) {
+        this.statusOverlayY = y;
+    }
+
+    @Override
+    public void setCompassOverlayX(int x) {
+        this.compassOverlayX = x;
+    }
+
+    @Override
+    public void setCompassOverlayY(int y) {
+        this.compassOverlayY = y;
+    }
+
+    @Override
+    public void setStatusOverlayScale(float scale) {
+        this.statusOverlayScale = scale;
+    }
+
+    @Override
+    public void setCompassOverlayScale(float scale) {
+        this.compassOverlayScale = scale;
     }
 }

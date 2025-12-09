@@ -33,3 +33,4 @@ logs/
 # other
 eclipse
 run
+build_docs/

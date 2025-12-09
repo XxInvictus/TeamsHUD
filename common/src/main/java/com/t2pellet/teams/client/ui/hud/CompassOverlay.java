@@ -23,6 +23,8 @@ public class CompassOverlay {
     public boolean enabled = true;
     private final Minecraft client;
     private boolean isShowing = false;
+    private int baseX = 0;
+    private int baseY = 0;
 
     public CompassOverlay() {
         this.client = Minecraft.getInstance();
@@ -31,12 +33,57 @@ public class CompassOverlay {
     public boolean isShowing() {
         return isShowing;
     }
+    
+    public int getBaseX() {
+        return baseX;
+    }
+    
+    public int getBaseY() {
+        return baseY;
+    }
+    
+    public int getWidth() {
+        return HUD_WIDTH;
+    }
+    
+    public int getHeight() {
+        // Return unscaled height - scaling will be applied in hit detection
+        return HUD_HEIGHT + 50; // Include space for heads
+    }
+    
+    public float getScale() {
+        return Services.PLATFORM.getConfig().compassOverlayScale();
+    }
 
     public void render(GuiGraphics graphics) {
         if (!Services.PLATFORM.getConfig().enableCompassHUD() || !enabled) {
             isShowing = false;
             return;
         }
+
+        // Get position and scale from config
+        int configX = Services.PLATFORM.getConfig().compassOverlayX();
+        int configY = Services.PLATFORM.getConfig().compassOverlayY();
+        float scale = Services.PLATFORM.getConfig().compassOverlayScale();
+        
+        // Use default position if not set (centered at top)
+        if (configX == -1) {
+            baseX = (client.getWindow().getGuiScaledWidth() - HUD_WIDTH) / 2;
+        } else {
+            baseX = configX;
+        }
+        
+        if (configY == -1) {
+            baseY = 5 + HUD_HEIGHT / 2;
+        } else {
+            baseY = configY;
+        }
+
+        // Apply scale transformation
+        graphics.pose().pushPose();
+        graphics.pose().translate(baseX, baseY, 0);
+        graphics.pose().scale(scale, scale, 1.0f);
+        graphics.pose().translate(-baseX, -baseY, 0);
 
         // Render heads
         boolean renderedAnyHead = false;
@@ -56,17 +103,32 @@ public class CompassOverlay {
 
         // Render bar
         if (ClientTeam.INSTANCE.isInTeam() && !ClientTeam.INSTANCE.isTeamEmpty() && renderedAnyHead) {
-            var x = (client.getWindow().getGuiScaledWidth() - HUD_WIDTH) / 2;
-            var y = 5 + HUD_HEIGHT / 2;
             float alpha = (1 - minScale) * (1 - MIN_ALPHA) + MIN_ALPHA;
             RenderSystem.enableBlend();
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
-            graphics.blit(GUI_ICONS_LOCATION, x, y, 0, 74, HUD_WIDTH, HUD_HEIGHT);
+            graphics.blit(GUI_ICONS_LOCATION, baseX, baseY, 0, 74, HUD_WIDTH, HUD_HEIGHT);
+            
             RenderSystem.disableBlend();
             isShowing = true;
         } else {
             isShowing = false;
         }
+        
+        graphics.pose().popPose();
+        
+        // Render drag indicator if unlocked (outside scale transformation)
+        if (!HudDragManager.isLocked() && isShowing) {
+            renderDragIndicator(graphics, scale);
+        }
+    }
+    
+    private void renderDragIndicator(GuiGraphics graphics, float scale) {
+        // Draw a subtle border to indicate draggability (using scaled dimensions)
+        int color = HudDragManager.getCurrentTarget() == HudDragManager.DragTarget.COMPASS 
+            ? 0x8800FF00 : 0x44FFFFFF;
+        int scaledWidth = (int) (HUD_WIDTH * scale);
+        int scaledHeight = (int) ((HUD_HEIGHT + 50) * scale);
+        graphics.fill(baseX - 1, baseY - 1, baseX + scaledWidth + 1, baseY + scaledHeight + 1, color);
     }
 
     private double caculateRotationHead() {
@@ -117,9 +179,8 @@ public class CompassOverlay {
     }
 
     private void renderHUDHead(GuiGraphics graphics, ResourceLocation skin, float scaleFactor, double renderFactor) {
-        int scaledWidth = client.getWindow().getGuiScaledWidth();
-        int x = (int) (scaledWidth / 2 - HUD_WIDTH / 4 + renderFactor * HUD_WIDTH / 2 + 41);
-        int y = 5 + HUD_HEIGHT + 4;
+        int x = (int) (baseX + HUD_WIDTH / 2 - HUD_WIDTH / 4 + renderFactor * HUD_WIDTH / 2 + 41);
+        int y = baseY + HUD_HEIGHT + 4;
         float sizeFactor = scaleFactor * (MAX_SCALE - MIN_SCALE) + MIN_SCALE;
         float alphaFactor = (1 - scaleFactor) * (1 - MIN_ALPHA) + MIN_ALPHA;
         graphics.pose().pushPose();
