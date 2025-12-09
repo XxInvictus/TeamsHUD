@@ -82,14 +82,28 @@ public class TeamsHUDClient {
     }
     
     public static boolean onMouseClick(double mouseX, double mouseY, int button) {
+        return onMouseClick(mouseX, mouseY, button, false);
+    }
+    
+    public static boolean onMouseClick(double mouseX, double mouseY, int button, boolean alreadyScaled) {
         // Only handle left click (button 0)
         if (button != 0 || com.t2pellet.teams.client.ui.hud.HudDragManager.isLocked()) {
             return false;
         }
         
         Minecraft client = Minecraft.getInstance();
-        int scaledMouseX = (int) (mouseX * client.getWindow().getGuiScaledWidth() / client.getWindow().getScreenWidth());
-        int scaledMouseY = (int) (mouseY * client.getWindow().getGuiScaledHeight() / client.getWindow().getScreenHeight());
+        int scaledMouseX;
+        int scaledMouseY;
+        
+        if (alreadyScaled) {
+            // Called from a Screen - coordinates are already GUI scaled
+            scaledMouseX = (int) mouseX;
+            scaledMouseY = (int) mouseY;
+        } else {
+            // Called from GLFW - need to convert from window to GUI scaled coordinates
+            scaledMouseX = (int) (mouseX * client.getWindow().getGuiScaledWidth() / client.getWindow().getScreenWidth());
+            scaledMouseY = (int) (mouseY * client.getWindow().getGuiScaledHeight() / client.getWindow().getScreenHeight());
+        }
         
         // Check if clicking on status overlay
         if (status.enabled && ClientTeam.INSTANCE.isInTeam()) {
@@ -129,19 +143,37 @@ public class TeamsHUDClient {
     }
     
     public static boolean onMouseDrag(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        return onMouseDrag(mouseX, mouseY, button, dragX, dragY, false);
+    }
+    
+    public static boolean onMouseDrag(double mouseX, double mouseY, int button, double dragX, double dragY, boolean alreadyScaled) {
         if (!com.t2pellet.teams.client.ui.hud.HudDragManager.isDragging()) {
             return false;
         }
         
         Minecraft client = Minecraft.getInstance();
-        int scaledMouseX = (int) (mouseX * client.getWindow().getGuiScaledWidth() / client.getWindow().getScreenWidth());
-        int scaledMouseY = (int) (mouseY * client.getWindow().getGuiScaledHeight() / client.getWindow().getScreenHeight());
+        int scaledMouseX;
+        int scaledMouseY;
+        
+        if (alreadyScaled) {
+            // Called from a Screen - coordinates are already GUI scaled
+            scaledMouseX = (int) mouseX;
+            scaledMouseY = (int) mouseY;
+        } else {
+            // Called from GLFW - need to convert from window to GUI scaled coordinates
+            scaledMouseX = (int) (mouseX * client.getWindow().getGuiScaledWidth() / client.getWindow().getScreenWidth());
+            scaledMouseY = (int) (mouseY * client.getWindow().getGuiScaledHeight() / client.getWindow().getScreenHeight());
+        }
         
         com.t2pellet.teams.client.ui.hud.HudDragManager.updateDrag(scaledMouseX, scaledMouseY);
         return true;
     }
     
     public static boolean onMouseRelease(double mouseX, double mouseY, int button) {
+        return onMouseRelease(mouseX, mouseY, button, false);
+    }
+    
+    public static boolean onMouseRelease(double mouseX, double mouseY, int button, boolean alreadyScaled) {
         if (!com.t2pellet.teams.client.ui.hud.HudDragManager.isDragging()) {
             return false;
         }

@@ -75,9 +75,15 @@ public class TeamsKeys {
     });
 
     public static final TeamsKey TOGGLE_HUD_LOCK = new TeamsKey("key.teams.toggle_hud_lock", GLFW.GLFW_KEY_L, client -> {
-        com.t2pellet.teams.client.ui.hud.HudDragManager.toggleLock();
-        String lockState = com.t2pellet.teams.client.ui.hud.HudDragManager.isLocked() ? "locked" : "unlocked";
-        client.player.displayClientMessage(net.minecraft.network.chat.Component.literal("HUD " + lockState), true);
+        if (com.t2pellet.teams.client.ui.hud.HudDragManager.isLocked()) {
+            // Unlock and open drag screen
+            com.t2pellet.teams.client.ui.hud.HudDragManager.toggleLock();
+            client.setScreen(new com.t2pellet.teams.client.ui.menu.HudDragScreen());
+        } else {
+            // Lock (this happens from within the drag screen via ESC/L key)
+            com.t2pellet.teams.client.ui.hud.HudDragManager.toggleLock();
+            client.player.displayClientMessage(net.minecraft.network.chat.Component.literal("HUD locked"), true);
+        }
     });
 
     static final TeamsKey[] KEYS = {

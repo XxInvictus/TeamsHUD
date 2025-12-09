@@ -48,9 +48,11 @@ public class TeamsMainScreen extends TeamsScreen {
         
         // Add HUD lock toggle button (above the bottom row)
         addRenderableWidget(Button.builder(ModComponents.TOGGLE_HUD_LOCK_TEXT, button -> {
-            com.t2pellet.teams.client.ui.hud.HudDragManager.toggleLock();
-            // Close the menu after toggling so user can interact with the HUD
-            minecraft.setScreen(null);
+            if (com.t2pellet.teams.client.ui.hud.HudDragManager.isLocked()) {
+                // Unlock and open drag screen
+                com.t2pellet.teams.client.ui.hud.HudDragManager.toggleLock();
+                minecraft.setScreen(new HudDragScreen());
+            }
         }).bounds(this.width / 2 - 60, y + HEIGHT - 55, 120, 20).build());
     }
 

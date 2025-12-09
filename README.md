@@ -21,6 +21,22 @@ A Minecraft mod that adds team management functionality with visual HUD elements
 - **Accept** (Right Bracket `]`): Accept team invitations or join requests
 - **Reject** (Left Bracket `[`): Reject team invitations or join requests  
 - **Toggle HUD** (B): Toggle compass and status HUD visibility
+- **Toggle HUD Lock** (L): Lock/unlock HUD positioning (opens drag mode when unlocked)
+
+### HUD Customization
+- **Lock/Unlock HUD**: Press **L** or use the button in the Teams menu to toggle HUD lock
+  - When **unlocked**: A transparent overlay appears allowing you to drag HUD elements
+  - White borders appear around draggable elements
+  - Click and drag the Status HUD or Compass HUD to reposition them
+  - Press **ESC** or **L** to exit drag mode and lock the HUD
+- **Scale HUD Elements**: Configure scaling from 0.1x (10%) to 3.0x (300%) in the mod settings
+  - Adjust `statusOverlayScale` and `compassOverlayScale` in config files
+  - Default scale: 1.0 (100%)
+- **Position Persistence**: HUD positions and scales are saved to your config file
+- **Drag Mode Tips**:
+  - Drag indicator turns green when actively dragging an element
+  - Both overlays can be positioned independently
+  - Works with scaled overlays
 
 ### Configuration Options
 - Show invisible teammates
