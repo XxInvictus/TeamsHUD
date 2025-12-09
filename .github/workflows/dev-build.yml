@@ -191,7 +191,7 @@ jobs:
           mc: ${{ steps.properties.outputs.minecraft_version }}
           modloader: fabric
           regex: '.*fabric.*'
-          mc-runtime-test: lexfabric
+          mc-runtime-test: fabric
 
   test-fabric-server:
     name: Test Fabric Server
@@ -252,7 +252,7 @@ jobs:
           mc: ${{ steps.properties.outputs.minecraft_version }}
           modloader: fabric
           regex: '.*fabric.*'
-          mc-runtime-test: lexfabric
+          mc-runtime-test: fabric
 
   test-forge-client:
     name: Test Forge Client
