@@ -3,7 +3,6 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.xxinvictus.teamshudplus.mixin",
-  "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "AdvancementMixinFabric"
