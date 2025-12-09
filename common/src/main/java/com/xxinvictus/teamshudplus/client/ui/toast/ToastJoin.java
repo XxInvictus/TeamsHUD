@@ -24,11 +24,11 @@ public class ToastJoin extends TeamToast {
 
     @Override
     public String title() {
-        return local ? I18n.get("teams.toast.join") : I18n.get("teams.toast.joined");
+        return local ? I18n.get("teamshudplus.toast.join") : I18n.get("teamshudplus.toast.joined");
     }
 
     @Override
     public String subTitle() {
-        return local ? I18n.get("teams.toast.join.details", team) : I18n.get("teams.toast.joined.details", name);
+        return local ? I18n.get("teamshudplus.toast.join.details", team) : I18n.get("teamshudplus.toast.joined.details", name);
     }
 }

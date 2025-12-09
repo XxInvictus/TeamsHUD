@@ -16,10 +16,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "${mod_group_id}.${mod_name}Fabric"
+      "${mod_group_id}.${mod_id}.${mod_name}Fabric"
     ],
     "client": [
-      "${mod_group_id}.client.${mod_name}ClientFabric"
+      "${mod_group_id}.${mod_id}.client.${mod_name}ClientFabric"
     ]
   },
   "mixins": [
@@ -29,7 +29,7 @@
 
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
-    "fabric-api": "${fabric_version}",
+    "fabric-api": "*",
     "java": ">=17"
   }
 }

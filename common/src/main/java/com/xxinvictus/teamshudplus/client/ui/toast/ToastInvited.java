@@ -17,7 +17,7 @@ public class ToastInvited extends RespondableTeamToast {
 
     @Override
     public String title() {
-        return I18n.get("teams.toast.invite", team);
+        return I18n.get("teamshudplus.toast.invite", team);
     }
 
 }

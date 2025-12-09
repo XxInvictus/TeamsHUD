@@ -28,14 +28,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  */
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends Player implements IHasTeam {
-	/** Shadowed game mode field */
-	@Shadow @Final public ServerPlayerGameMode gameMode;
-
-	/** Shadowed server level accessor 
-	 * @return The server level
-	 */
-	@Shadow public abstract ServerLevel serverLevel();
-
 	/** The team this player is in */
 	@Unique
 	private ModTeam team;
@@ -101,7 +93,8 @@ public abstract class ServerPlayerMixin extends Player implements IHasTeam {
 	@Inject(at = @At(value = "TAIL"), method = "readAdditionalSaveData")
 	private void readCustomDataFromNbt(CompoundTag nbt, CallbackInfo info) {
 		if (team == null && nbt.contains("playerTeam")) {
-			team = TeamDB.getOrMakeDefault(this.serverLevel().getServer()).getTeam(nbt.getString("playerTeam"));
+			ServerPlayer player = (ServerPlayer) (Object) this;
+			team = TeamDB.getOrMakeDefault(player.serverLevel().getServer()).getTeam(nbt.getString("playerTeam"));
 			if (team == null || !team.hasPlayer(getUUID())) {
 				team = null;
 			}
@@ -112,15 +105,5 @@ public abstract class ServerPlayerMixin extends Player implements IHasTeam {
 	private void playerTick(CallbackInfo info) {
 		var player = (ServerPlayer) ((Object) this);
 		TeamsHUDPlus.onPlayerHealthUpdate(player,player.getHealth(),player.getFoodData().getFoodLevel());
-	}
-
-	@Override
-	public boolean isSpectator() {
-		return this.gameMode.getGameModeForPlayer() == GameType.SPECTATOR;
-	}
-
-	@Override
-	public boolean isCreative() {
-		return this.gameMode.getGameModeForPlayer() == GameType.CREATIVE;
 	}
 }

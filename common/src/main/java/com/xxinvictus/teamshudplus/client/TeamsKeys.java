@@ -39,7 +39,7 @@ public class TeamsKeys {
                     keyName,
                     InputConstants.Type.KEYSYM,
                     keyBind,
-                    "key.category.teams"
+                    "key.category.teamshudplus"
             );
             onPress = action;
         }
@@ -66,7 +66,7 @@ public class TeamsKeys {
     }
 
     /** Key to accept team invitations or requests (default: right bracket) */
-    public static final TeamsKey ACCEPT = new TeamsKey("key.teams.accept", GLFW.GLFW_KEY_RIGHT_BRACKET, client -> {
+    public static final TeamsKey ACCEPT = new TeamsKey("key.teamshudplus.accept", GLFW.GLFW_KEY_RIGHT_BRACKET, client -> {
         var toastManager = client.getToasts();
         ToastInvited invited = toastManager.getToast(ToastInvited.class, Toast.NO_TOKEN);
         if (invited != null) {
@@ -82,7 +82,7 @@ public class TeamsKeys {
     });
 
     /** Key to reject team invitations or requests (default: left bracket) */
-    public static final TeamsKey REJECT = new TeamsKey("key.teams.reject", GLFW.GLFW_KEY_LEFT_BRACKET, client -> {
+    public static final TeamsKey REJECT = new TeamsKey("key.teamshudplus.reject", GLFW.GLFW_KEY_LEFT_BRACKET, client -> {
         var toastManager = client.getToasts();
         ToastInvited toast = toastManager.getToast(ToastInvited.class, Toast.NO_TOKEN);
         if (toast != null) {
@@ -96,13 +96,13 @@ public class TeamsKeys {
     });
 
     /** Key to toggle HUD visibility (default: B) */
-    public static final TeamsKey TOGGLE_HUD = new TeamsKey("key.teams.toggle_hud", GLFW.GLFW_KEY_B, client -> {
+    public static final TeamsKey TOGGLE_HUD = new TeamsKey("key.teamshudplus.toggle_hud", GLFW.GLFW_KEY_B, client -> {
         TeamsHUDPlusClient.compass.enabled = !TeamsHUDPlusClient.compass.enabled;
         TeamsHUDPlusClient.status.enabled = !TeamsHUDPlusClient.status.enabled;
     });
 
     /** Key to toggle HUD lock/unlock for repositioning (default: L) */
-    public static final TeamsKey TOGGLE_HUD_LOCK = new TeamsKey("key.teams.toggle_hud_lock", GLFW.GLFW_KEY_L, client -> {
+    public static final TeamsKey TOGGLE_HUD_LOCK = new TeamsKey("key.teamshudplus.toggle_hud_lock", GLFW.GLFW_KEY_L, client -> {
         if (com.xxinvictus.teamshudplus.client.ui.hud.HudDragManager.isLocked()) {
             // Unlock and open drag screen
             com.xxinvictus.teamshudplus.client.ui.hud.HudDragManager.toggleLock();

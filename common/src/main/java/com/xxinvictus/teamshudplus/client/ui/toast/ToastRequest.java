@@ -17,11 +17,11 @@ public class ToastRequest extends TeamToast {
 
     @Override
     public String title() {
-        return I18n.get("teams.toast.request");
+        return I18n.get("teamshudplus.toast.request");
     }
 
     @Override
     public String subTitle() {
-        return I18n.get("teams.toast.request.details", team);
+        return I18n.get("teamshudplus.toast.request.details", team);
     }
 }
