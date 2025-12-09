@@ -181,30 +181,29 @@ jobs:
       
       - name: Download Dependencies
         run: |
+          set -euo pipefail
           mkdir -p run/mods
-          # Download Cloth Config using Modrinth API
           echo "Fetching Cloth Config version info from Modrinth API..."
           cloth_config_version="${{ steps.properties.outputs.cloth_config_version }}"
           minecraft_version="${{ steps.properties.outputs.minecraft_version }}"
-          
-          # Query Modrinth API for the correct version
-          version_data=$(curl -s "https://api.modrinth.com/v2/project/9s6osm5g/version?loaders=[%22fabric%22]&game_versions=[%22${minecraft_version}%22]")
-          
-          # Find the matching version by cloth config version number
-          file_url=$(echo "$version_data" | jq -r ".[] | select(.version_number == \"${cloth_config_version}+fabric\") | .files[0].url")
-          
-          if [ -z "$file_url" ] || [ "$file_url" = "null" ]; then
-            echo "Failed to find exact version, trying without +fabric suffix..."
-            file_url=$(echo "$version_data" | jq -r ".[] | select(.version_number | startswith(\"${cloth_config_version}\")) | .files[0].url")
+
+          api_url="https://api.modrinth.com/v2/project/9s6osm5g/version?loaders=%5B%22fabric%22%5D&game_versions=%5B%22${minecraft_version}%22%5D"
+          version_data=$(curl -sS "$api_url" ) || true
+
+          # Ensure jq is available on the runner
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update -qq && sudo apt-get install -y -qq jq
           fi
-          
+
+          file_url=$(printf "%s" "$version_data" | jq -r --arg cloth "${cloth_config_version}" '([(.[] | select(.version_number == ($cloth + "+fabric")) | .files[0].url), (.[] | select(.version_number | startswith($cloth)) | .files[0].url)] | map(select(.!=null)) | .[0])')
+
           if [ -z "$file_url" ] || [ "$file_url" = "null" ]; then
             echo "Error: Could not find Cloth Config version ${cloth_config_version} for Minecraft ${minecraft_version}"
             exit 1
           fi
-          
+
           echo "Downloading Cloth Config from ${file_url}"
-          curl -L -o "run/mods/cloth-config.jar" "${file_url}"
+          curl -L -f -o "run/mods/cloth-config.jar" "${file_url}"
       
       - name: Prepare Test Environment
         run: |
@@ -213,6 +212,10 @@ jobs:
           find build/libs -name '*-fabric-*.jar' ! -name '*-javadoc.jar' ! -name '*-sources.jar' -exec cp {} run/mods/ \;
           echo "Mods directory:"
           ls -la run/mods/
+          echo "Checking for refmap in JAR:"
+          jar tf run/mods/*.jar | grep -i refmap || echo "No refmap found in JAR"
+          echo "Checking mixin JSON contents:"
+          unzip -p run/mods/*.jar teamshudplus.mixins.json | head -20 || echo "Could not extract mixin JSON"
       
       - name: Run Fabric Client Test
         uses: headlesshq/mc-runtime-test@4.1.0
