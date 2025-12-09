@@ -9,13 +9,22 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
-
+/**
+ * Screen shown when the player is not in a team.
+ * Displays available teams and buttons to create or join a team.
+ */
 public class TeamsLonelyScreen extends TeamsScreen {
 
+    /** Width of the screen */
     static final int WIDTH = 256;
+    /** Height of the screen */
     static final int HEIGHT = 166;
     private static final ResourceLocation TEXTURE = TeamsHUD.id("textures/gui/screen_background.png");
 
+    /**
+     * Creates a lonely screen.
+     * @param parent The parent screen
+     */
     public TeamsLonelyScreen(Screen parent) {
         super(parent, ModComponents.LONELY_MENU_TITLE);
     }
@@ -48,6 +57,9 @@ public class TeamsLonelyScreen extends TeamsScreen {
         }
     }
 
+    /**
+     * Refreshes this screen by creating a new instance.
+     */
     public void refresh() {
         minecraft.setScreen(new TeamsLonelyScreen(parent));
     }

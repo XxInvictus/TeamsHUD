@@ -9,9 +9,15 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+/**
+ * Screen for inviting a player to the team.
+ */
 public class TeamsInviteScreen extends TeamsInputScreen {
 
-
+    /**
+     * Creates a team invite screen.
+     * @param parent The parent screen
+     */
     public TeamsInviteScreen(Screen parent) {
         super(parent, ModComponents.INVITE_TITLE_TEXT);
     }

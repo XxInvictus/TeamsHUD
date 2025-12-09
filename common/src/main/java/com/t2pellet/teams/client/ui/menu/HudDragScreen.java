@@ -7,12 +7,16 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 /**
- * Transparent overlay screen that allows dragging HUD elements with visible mouse cursor
+ * Transparent overlay screen that allows dragging HUD elements with visible mouse cursor.
+ * Provides an interface for repositioning status and compass overlays.
  */
 public class HudDragScreen extends Screen {
     
     private boolean isDragging = false;
     
+    /**
+     * Creates a new HUD drag screen
+     */
     public HudDragScreen() {
         super(Component.literal("HUD Drag Mode"));
     }

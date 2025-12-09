@@ -8,16 +8,27 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
+/**
+ * Base class for team screens with text input fields.
+ * Provides an input field, submit button, and back button.
+ */
 public abstract class TeamsInputScreen extends TeamsScreen {
 
     private static final ResourceLocation TEXTURE = TeamsHUD.id("textures/gui/smaller_background.png");
     private static final int WIDTH = 120;
     private static final int HEIGHT = 110;
 
+    /** The text input field */
     protected EditBox inputField;
+    /** The submit button */
     protected Button submitButton;
     private String prevInputText = "";
 
+    /**
+     * Creates an input screen.
+     * @param parent The parent screen
+     * @param title The screen title
+     */
     public TeamsInputScreen(Screen parent, Component title) {
         super(parent, title);
     }
@@ -53,10 +64,22 @@ public abstract class TeamsInputScreen extends TeamsScreen {
         return TEXTURE;
     }
 
+    /**
+     * Gets the text for the submit button.
+     * @return The submit button text
+     */
     protected abstract Component getSubmitText();
 
+    /**
+     * Called when the submit button is pressed.
+     * @param widget The button that was pressed
+     */
     protected abstract void onSubmit(Button widget);
 
+    /**
+     * Determines whether the submit button should be enabled.
+     * @return true if the submit button should be active
+     */
     protected abstract boolean submitCondition();
 
 }

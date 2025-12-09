@@ -16,23 +16,37 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// This class is part of the common project meaning it is shared between all supported loaders. Code written here can only
-// import and access the vanilla codebase, libraries used by vanilla, and optionally third party libraries that provide
-// common compatible binaries. This means common code can not directly use loader specific concepts such as Forge events
-// however it will be compatible with all supported mod loaders.
+/**
+ * Main mod initialization class for TeamsHUD.
+ * Handles common logic for both Forge and Fabric platforms including:
+ * - Packet registration
+ * - Player connection/disconnection events
+ * - Advancement synchronization
+ * - Health/hunger updates
+ */
 public class TeamsHUD {
 
+    /** The mod ID used for registration and resource locations */
     public static final String MODID = "teams";
+    /** The mod display name */
     public static final String MOD_NAME = "TeamsHUD";
+    /** Logger for mod messages */
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
 
-    // The loader specific projects are able to import and use any code from the common project. This allows you to
-    // write the majority of your code here and load it from your loader specific projects. This example has some
-    // code that gets invoked by the entry point of the loader specific projects.
+    /**
+     * Initializes the mod by registering network packets.
+     * Called by platform-specific entry points.
+     */
     public static void init() {
         CommonPacketHandler.registerPackets();
     }
 
+    /**
+     * Handles player advancement events. If advancement syncing is enabled,
+     * adds the advancement to the player's team.
+     * @param player The player who earned the advancement
+     * @param advancement The advancement earned
+     */
     public static void onAdvancement(ServerPlayer player, Advancement advancement) {
         if (!Services.PLATFORM.getConfig().syncAdvancements()) {
             return;
@@ -44,6 +58,11 @@ public class TeamsHUD {
         }
     }
 
+    /**
+     * Handles player connection. Marks player as online in their team and
+     * sends team data packets to sync the client.
+     * @param player The player connecting
+     */
     public static void playerConnect(ServerPlayer player) {
         TeamDB teamDB = TeamDB.getOrMakeDefault(player.server);
         ModTeam team = teamDB.getTeam(player);
@@ -57,6 +76,10 @@ public class TeamsHUD {
         Services.PLATFORM.sendToClient(new S2CTeamDataPacket(S2CTeamDataPacket.Type.ONLINE, onlineTeams), player);
     }
 
+    /**
+     * Handles player disconnection. Marks player as offline in their team.
+     * @param player The player disconnecting
+     */
     public static void playerDisconnect(ServerPlayer player) {
         TeamDB teamDB = TeamDB.getOrMakeDefault(player.server);
         ModTeam team = teamDB.getTeam(player);
@@ -66,6 +89,13 @@ public class TeamsHUD {
         teamDB.setDirty();
     }
 
+    /**
+     * Handles player cloning (death/respawn, dimension change). Transfers
+     * team membership from old to new player entity.
+     * @param oldPlayer The old player entity
+     * @param newPlayer The new player entity
+     * @param alive Whether the player is still alive (dimension change vs death)
+     */
     public static void playerClone(ServerPlayer oldPlayer,ServerPlayer newPlayer,boolean alive) {
         TeamDB teamDB = TeamDB.getOrMakeDefault(oldPlayer.server);
         ModTeam team = teamDB.getTeam(oldPlayer);
@@ -75,6 +105,13 @@ public class TeamsHUD {
         }
     }
 
+    /**
+     * Handles player health/hunger updates. Syncs the updated stats to all
+     * other teammates.
+     * @param player The player whose stats changed
+     * @param health The new health value
+     * @param hunger The new hunger value
+     */
     public static void onPlayerHealthUpdate(ServerPlayer player, float health, int hunger) {
         ModTeam team = TeamDB.getOrMakeDefault(player.server).getTeam(player);
         if (team != null) {
@@ -83,14 +120,27 @@ public class TeamsHUD {
         }
     }
 
+    /**
+     * Creates a ResourceLocation with the mod's namespace.
+     * @param path The resource path
+     * @return A ResourceLocation for this mod
+     */
     public static ResourceLocation id(String path) {
         return new ResourceLocation(MODID,path);
     }
 
+    /**
+     * Called when the server stops.
+     * @param server The stopping server
+     */
     public static void onServerStopped(MinecraftServer server) {
 
     }
 
+    /**
+     * Called when the server starts.
+     * @param server The starting server
+     */
     public static void onServerStarted(MinecraftServer server) {
 
     }

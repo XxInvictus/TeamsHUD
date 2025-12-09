@@ -20,6 +20,10 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.List;
 
+/**
+ * Mixin for TeamMsgCommand to fix team messaging with ModTeam instances.
+ * Ensures the /teammsg command works correctly with custom team implementations.
+ */
 @Mixin(TeamMsgCommand.class)
 public abstract class TeamMessageCommandMixin {
 
@@ -27,7 +31,14 @@ public abstract class TeamMessageCommandMixin {
         throw new AssertionError();
     }
 
-    //private static synthetic lambda$register$2(Lcom/mojang/brigadier/context/CommandContext;)I throws com/mojang/brigadier/exceptions/CommandSyntaxException
+    /**
+     * Injects into the team message command to handle ModTeam instances.
+     * @param ctx The command context
+     * @param cir Callback info returnable
+     * @param commandSource The command source
+     * @param entity The entity sending the message
+     * @throws CommandSyntaxException If command syntax is invalid
+     */
     @Inject(method = "*(Lcom/mojang/brigadier/context/CommandContext;)I",at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getTeam()Lnet/minecraft/world/scores/Team;"),
             locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private static void fixMsgCommand(CommandContext<CommandSourceStack> ctx, CallbackInfoReturnable<Integer> cir, CommandSourceStack commandSource, Entity entity) throws CommandSyntaxException {

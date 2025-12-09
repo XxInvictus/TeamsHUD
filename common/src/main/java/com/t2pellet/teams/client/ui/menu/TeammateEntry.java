@@ -15,9 +15,15 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 
+/**
+ * UI widget representing a teammate in the team member list.
+ * Shows teammate name, status, and action buttons (kick, favorite).
+ */
 public class TeammateEntry extends AbstractWidget {
 
+    /** Width of the entry widget */
     static final int WIDTH = 244;
+    /** Height of the entry widget */
     static final int HEIGHT = 24;
     private static final ResourceLocation TEXTURE = TeamsHUD.id("textures/gui/screen_background.png");
 
@@ -28,6 +34,13 @@ public class TeammateEntry extends AbstractWidget {
     private final int x;
     private final int y;
 
+    /**
+     * Creates a teammate entry widget.
+     * @param teammate The teammate data
+     * @param x The X position
+     * @param y The Y position
+     * @param local Whether this is the local player
+     */
     public TeammateEntry(ClientTeam.Teammate teammate, int x, int y, boolean local) {
         super(x,y,WIDTH,HEIGHT, ModComponents.literal(teammate.name));
         this.client = Minecraft.getInstance();
@@ -89,11 +102,18 @@ public class TeammateEntry extends AbstractWidget {
 
     }
 
-
+    /**
+     * Gets the kick button widget.
+     * @return The kick button
+     */
     public ImageButton getKickButton() {
         return kickButton;
     }
 
+    /**
+     * Gets the favorite toggle button widget.
+     * @return The favorite button
+     */
     public TexturedToggleWidget getFavButton() {
         return favButton;
     }

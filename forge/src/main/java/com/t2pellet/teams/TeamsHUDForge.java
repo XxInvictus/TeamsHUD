@@ -19,9 +19,16 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
 
+/**
+ * Forge platform entry point for TeamsHUD.
+ * Registers configs, event listeners, and initializes client/common code.
+ */
 @Mod(TeamsHUD.MODID)
 public class TeamsHUDForge {
     
+    /**
+     * Forge mod constructor. Registers configs and event listeners.
+     */
     public TeamsHUDForge() {
         TeamsHUD.LOGGER.info("Teams forge mod init!");
         ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.CLIENT, CLIENT_SPEC);
@@ -48,10 +55,14 @@ public class TeamsHUDForge {
         TeamsHUD.init();
     }
 
+    /** Client-side configuration instance */
     public static final TomlConfig.Client CLIENT;
+    /** Client-side configuration specification */
     public static final ForgeConfigSpec CLIENT_SPEC;
 
+    /** Server-side configuration instance */
     public static final TomlConfig.Server SERVER;
+    /** Server-side configuration specification */
     public static final ForgeConfigSpec SERVER_SPEC;
 
     static {
@@ -63,34 +74,58 @@ public class TeamsHUDForge {
         SERVER = specPair2.getLeft();
     }
 
+    /**
+     * Handles advancement earn events.
+     */
     private void onAdvancement(AdvancementEvent.AdvancementEarnEvent event) {
         TeamsHUD.onAdvancement((ServerPlayer) event.getEntity(),event.getAdvancement());
     }
 
+    /**
+     * Handles server started event.
+     */
     private void onServerStarted(ServerStartedEvent event) {
         TeamsHUD.onServerStarted(event.getServer());
     }
 
+    /**
+     * Handles server stopped event.
+     */
     private void onServerStopped(ServerStoppedEvent event) {
         TeamsHUD.onServerStopped(event.getServer());
     }
 
+    /**
+     * Handles player login event.
+     */
     private void login(PlayerEvent.PlayerLoggedInEvent event) {
         TeamsHUD.playerConnect((ServerPlayer) event.getEntity());
     }
 
+    /**
+     * Handles player logout event.
+     */
     private void logout(PlayerEvent.PlayerLoggedOutEvent event) {
         TeamsHUD.playerDisconnect((ServerPlayer) event.getEntity());
     }
 
+    /**
+     * Handles player clone event (respawn/dimension change).
+     */
     private void playerClone(PlayerEvent.Clone event) {
         TeamsHUD.playerClone((ServerPlayer) event.getOriginal(), (ServerPlayer) event.getEntity(),!event.isWasDeath());
     }
 
+    /**
+     * Registers commands with the dispatcher.
+     */
     private void registerCommand(RegisterCommandsEvent event) {
         TeamCommand.register(event.getDispatcher());
     }
 
+    /**
+     * Common setup event handler.
+     */
     private void commonSetup(FMLCommonSetupEvent event) {
     }
 

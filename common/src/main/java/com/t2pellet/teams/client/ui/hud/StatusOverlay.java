@@ -13,12 +13,17 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 
+/**
+ * Renders teammate health and hunger status overlay.
+ * Shows player heads with health bars and hunger levels.
+ */
 public class StatusOverlay {
 
     private static final ResourceLocation ICONS = TeamsHUD.id("textures/gui/hudicons.png");
     private static final int OVERLAY_WIDTH = 100; // Increased from 80 to accommodate distance text
     private static final int OVERLAY_HEIGHT_PER_PLAYER = 46;
 
+    /** Whether the status overlay is enabled */
     public boolean enabled = true;
     private final Minecraft client;
     private int offsetY = 0;
@@ -26,31 +31,58 @@ public class StatusOverlay {
     private int baseY = 0;
     private int totalHeight = 0;
 
+    /**
+     * Creates a new status overlay
+     */
     public StatusOverlay() {
         this.client = Minecraft.getInstance();
     }
     
+    /**
+     * Gets the base X coordinate of the overlay
+     * @return The X coordinate
+     */
     public int getBaseX() {
         return baseX;
     }
     
+    /**
+     * Gets the base Y coordinate of the overlay
+     * @return The Y coordinate
+     */
     public int getBaseY() {
         return baseY;
     }
     
+    /**
+     * Gets the width of the status overlay
+     * @return The width in pixels
+     */
     public int getWidth() {
         return OVERLAY_WIDTH;
     }
     
+    /**
+     * Gets the total height of the status overlay
+     * @return The height in pixels
+     */
     public int getHeight() {
         // Return unscaled height - scaling will be applied in hit detection
         return totalHeight;
     }
     
+    /**
+     * Gets the scale factor for the status overlay from config
+     * @return The scale factor
+     */
     public float getScale() {
         return Services.PLATFORM.getConfig().statusOverlayScale();
     }
 
+    /**
+     * Renders the status overlay to the screen
+     * @param graphics The graphics context for rendering
+     */
     public void render(GuiGraphics graphics) {
         offsetY = 0;
         

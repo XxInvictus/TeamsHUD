@@ -21,15 +21,31 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Mixin for ServerPlayer to implement team functionality.
+ * Adds team membership tracking and persistence to server players.
+ */
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends Player implements IHasTeam {
+	/** Shadowed game mode field */
 	@Shadow @Final public ServerPlayerGameMode gameMode;
 
+	/** Shadowed server level accessor 
+	 * @return The server level
+	 */
 	@Shadow public abstract ServerLevel serverLevel();
 
+	/** The team this player is in */
 	@Unique
 	private ModTeam team;
 
+	/**
+	 * Mixin constructor.
+	 * @param $$0 The level
+	 * @param $$1 The block position
+	 * @param $$2 The yaw rotation
+	 * @param $$3 The game profile
+	 */
 	public ServerPlayerMixin(Level $$0, BlockPos $$1, float $$2, GameProfile $$3) {
 		super($$0, $$1, $$2, $$3);
 	}
@@ -45,11 +61,17 @@ public abstract class ServerPlayerMixin extends Player implements IHasTeam {
 		return team;
 	}
 
+	/**
+	 * Sets the player's team.
+	 */
 	@Override
 	public void setTeam(ModTeam team) {
 		this.team = team;
 	}
 
+	/**
+	 * Checks if another player is a teammate.
+	 */
 	@Override
 	public boolean isTeammate(ServerPlayer other) {
 		if (team == null || other == null) {
@@ -62,6 +84,9 @@ public abstract class ServerPlayerMixin extends Player implements IHasTeam {
 		return team.equals(otherTeam);
 	}
 
+	/**
+	 * Saves team data to NBT.
+	 */
 	@Inject(at = @At(value = "TAIL"), method = "addAdditionalSaveData")
 	private void writeCustomDataToNbt(CompoundTag nbt, CallbackInfo info) {
 		if (team != null) {
@@ -69,6 +94,9 @@ public abstract class ServerPlayerMixin extends Player implements IHasTeam {
 		}
 	}
 
+	/**
+	 * Loads team data from NBT.
+	 */
 	@Inject(at = @At(value = "TAIL"), method = "readAdditionalSaveData")
 	private void readCustomDataFromNbt(CompoundTag nbt, CallbackInfo info) {
 		if (team == null && nbt.contains("playerTeam")) {

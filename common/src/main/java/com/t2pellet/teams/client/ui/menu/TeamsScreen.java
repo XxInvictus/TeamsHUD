@@ -9,13 +9,26 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
+/**
+ * Base class for all team-related UI screens.
+ * Provides common rendering and positioning logic.
+ */
 public abstract class TeamsScreen extends Screen {
 
+    /** The parent screen to return to when closing */
     public final Screen parent;
+    /** The X position of the screen */
     protected int x;
+    /** The Y position of the screen */
     protected int y;
+    /** Whether the player is currently in a team */
     protected boolean inTeam;
 
+    /**
+     * Creates a teams screen.
+     * @param parent The parent screen
+     * @param title The screen title
+     */
     public TeamsScreen(Screen parent, Component title) {
         super(title);
         this.parent = parent;
@@ -39,10 +52,22 @@ public abstract class TeamsScreen extends Screen {
         super.render(graphics, mouseX, mouseY, delta);
     }
 
+    /**
+     * Gets the width of the screen background.
+     * @return The screen width in pixels
+     */
     protected abstract int getWidth();
 
+    /**
+     * Gets the height of the screen background.
+     * @return The screen height in pixels
+     */
     protected abstract int getHeight();
 
+    /**
+     * Gets the background texture for this screen.
+     * @return The texture resource location
+     */
     protected abstract ResourceLocation getBackgroundTexture();
     
 }

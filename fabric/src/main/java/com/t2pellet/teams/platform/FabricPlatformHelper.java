@@ -20,8 +20,14 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.Locale;
 import java.util.function.Function;
 
+/**
+ * Fabric platform implementation of IPlatformHelper.
+ * Provides Fabric-specific implementations for platform services.
+ */
 public class FabricPlatformHelper implements IPlatformHelper {
+    /** The configuration instance for Fabric */
     MultiloaderConfig config = TeamsHUDFabric.getConfig();
+    
     @Override
     public Platform getPlatform() {
         return Platform.FABRIC;

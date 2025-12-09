@@ -20,11 +20,19 @@ import net.minecraft.server.level.ServerPlayer;
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
+/**
+ * Main command handler for the /teams command and all its subcommands.
+ * Provides team creation, invitations, leaving, kicking, removal, info, and listing functionality.
+ */
 public class TeamCommand {
 
     private TeamCommand() {
     }
 
+    /**
+     * Registers the /teams command and all its subcommands with the command dispatcher.
+     * @param dispatcher The command dispatcher to register with
+     */
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(literal("teams")
                 .then(literal("create")
@@ -128,6 +136,11 @@ public class TeamCommand {
         return Command.SINGLE_SUCCESS;
     }
 
+    /**
+     * Helper method to get the TeamDB instance from a command context.
+     * @param context The command context
+     * @return The server's TeamDB instance
+     */
     private static TeamDB get(CommandContext<CommandSourceStack> context) {
         return TeamDB.getOrMakeDefault(context.getSource().getServer());
     }

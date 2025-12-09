@@ -9,11 +9,17 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
+/**
+ * Mixin for PlayerTabOverlay to adjust tab list positioning when compass HUD is showing.
+ */
 @Mixin(PlayerTabOverlay.class)
 public class TabHudMixin {
 
     @Shadow @Final private Minecraft minecraft;
 
+    /**
+     * Modifies the tab list vertical position to avoid overlap with compass HUD.
+     */
     @ModifyVariable(method = "render", at = @At("STORE"), ordinal = 9)
     private int onRenderTabList(int p) {
         if (TeamsHUDClient.compass.isShowing()) {

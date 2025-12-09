@@ -8,8 +8,15 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+/**
+ * Screen for creating a new team.
+ */
 public class TeamsCreateScreen extends TeamsInputScreen {
 
+    /**
+     * Creates a team creation screen.
+     * @param parent The parent screen
+     */
     public TeamsCreateScreen(Screen parent) {
         super(parent, ModComponents.CREATE_TITLE);
     }

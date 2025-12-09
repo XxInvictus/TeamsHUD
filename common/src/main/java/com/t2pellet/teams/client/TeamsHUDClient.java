@@ -31,17 +31,31 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.UUID;
 
+/**
+ * Client-side initialization and event handling for TeamsHUD.
+ * Manages HUD overlays, key bindings, screen buttons, and client-side packet handling.
+ */
 public class TeamsHUDClient {
 
+    /** Status overlay showing teammate health and hunger */
     public static final StatusOverlay status = new StatusOverlay();
+    /** Compass overlay showing teammate positions */
     public static final CompassOverlay compass = new CompassOverlay();
 
+    /**
+     * Registers a key mapping with the Minecraft client.
+     * @param keyMapping The key mapping to register
+     */
     public static void registerKeybinding(KeyMapping keyMapping) {
         Minecraft.getInstance().options.keyMappings = ArrayUtils.add(Minecraft.getInstance().options.keyMappings, keyMapping);
     }
 
+    /** Texture for the teams button in the inventory screen */
     public static final ResourceLocation TEAMS_BUTTON_TEXTURE = TeamsHUD.id("textures/gui/buttonsmall.png");
 
+    /**
+     * Registers all mod key bindings.
+     */
     public static void registerKeybinds() {
         // Register keybinds
         for (TeamsKeys.TeamsKey key : TeamsKeys.KEYS) {
@@ -49,11 +63,21 @@ public class TeamsHUDClient {
         }
     }
 
+    /**
+     * Clears client-side team data when disconnecting from a server.
+     */
     public static void clientDisconnect() {
         ClientTeam.INSTANCE.reset();
         ClientTeamDB.INSTANCE.clear();
     }
 
+    /**
+     * Adds the teams button to the inventory screen after it initializes.
+     * @param minecraft The Minecraft client instance
+     * @param screen The screen being initialized
+     * @param scaledWidth The scaled screen width
+     * @param scaledHeight The scaled screen height
+     */
     public static void afterScreenInit(Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight){
         if (screen instanceof InventoryScreen inventoryScreen && minecraft.gameMode != null && !minecraft.gameMode.hasInfiniteItems()) {
             InventoryScreenAccessor screenAccessor = ((InventoryScreenAccessor) screen);
@@ -73,6 +97,9 @@ public class TeamsHUDClient {
         }
     }
 
+    /**
+     * Handles end of client tick. Processes key bindings and updates teammate distances.
+     */
     public static void endClientTick() {
         for (var key : TeamsKeys.KEYS) {
             if (key.keyBinding.consumeClick()) {
@@ -84,10 +111,25 @@ public class TeamsHUDClient {
         com.t2pellet.teams.client.core.TeammateDistanceTracker.tick();
     }
     
+    /**
+     * Handles mouse click events for HUD dragging.
+     * @param mouseX The mouse X position
+     * @param mouseY The mouse Y position
+     * @param button The mouse button clicked
+     * @return true if the click was handled
+     */
     public static boolean onMouseClick(double mouseX, double mouseY, int button) {
         return onMouseClick(mouseX, mouseY, button, false);
     }
     
+    /**
+     * Handles mouse click events for HUD dragging with optional coordinate scaling.
+     * @param mouseX The mouse X position
+     * @param mouseY The mouse Y position
+     * @param button The mouse button clicked
+     * @param alreadyScaled Whether coordinates are already GUI-scaled
+     * @return true if the click was handled
+     */
     public static boolean onMouseClick(double mouseX, double mouseY, int button, boolean alreadyScaled) {
         // Only handle left click (button 0)
         if (button != 0 || com.t2pellet.teams.client.ui.hud.HudDragManager.isLocked()) {
@@ -145,10 +187,29 @@ public class TeamsHUDClient {
         return false;
     }
     
+    /**
+     * Handles mouse drag events for HUD repositioning.
+     * @param mouseX The mouse X position
+     * @param mouseY The mouse Y position
+     * @param button The mouse button
+     * @param dragX The drag delta X
+     * @param dragY The drag delta Y
+     * @return true if the drag was handled
+     */
     public static boolean onMouseDrag(double mouseX, double mouseY, int button, double dragX, double dragY) {
         return onMouseDrag(mouseX, mouseY, button, dragX, dragY, false);
     }
     
+    /**
+     * Handles mouse drag events for HUD repositioning with optional coordinate scaling.
+     * @param mouseX The mouse X position
+     * @param mouseY The mouse Y position
+     * @param button The mouse button
+     * @param dragX The drag delta X
+     * @param dragY The drag delta Y
+     * @param alreadyScaled Whether coordinates are already GUI-scaled
+     * @return true if the drag was handled
+     */
     public static boolean onMouseDrag(double mouseX, double mouseY, int button, double dragX, double dragY, boolean alreadyScaled) {
         if (!com.t2pellet.teams.client.ui.hud.HudDragManager.isDragging()) {
             return false;
@@ -172,10 +233,25 @@ public class TeamsHUDClient {
         return true;
     }
     
+    /**
+     * Handles mouse release events to end HUD dragging.
+     * @param mouseX The mouse X position
+     * @param mouseY The mouse Y position
+     * @param button The mouse button
+     * @return true if the release was handled
+     */
     public static boolean onMouseRelease(double mouseX, double mouseY, int button) {
         return onMouseRelease(mouseX, mouseY, button, false);
     }
     
+    /**
+     * Handles mouse release events to end HUD dragging with optional coordinate scaling.
+     * @param mouseX The mouse X position
+     * @param mouseY The mouse Y position
+     * @param button The mouse button
+     * @param alreadyScaled Whether coordinates are already GUI-scaled
+     * @return true if the release was handled
+     */
     public static boolean onMouseRelease(double mouseX, double mouseY, int button, boolean alreadyScaled) {
         if (!com.t2pellet.teams.client.ui.hud.HudDragManager.isDragging()) {
             return false;
@@ -185,6 +261,13 @@ public class TeamsHUDClient {
         return true;
     }
 
+    /**
+     * Handles team update packets from the server (join/leave events).
+     * @param team The team name
+     * @param player The player name
+     * @param action The update action (JOIN or LEAVE)
+     * @param isLocal Whether this is the local player
+     */
     public static void handleTeamUpdatePacket(String team, String player, S2CTeamUpdatePacket.Action action, boolean isLocal) {
         switch (action) {
             case JOINED -> Minecraft.getInstance().getToasts().addToast(new ToastJoin(team, player, isLocal));
@@ -192,14 +275,28 @@ public class TeamsHUDClient {
         }
     }
 
+    /**
+     * Handles team request packets from the server (player requested to join).
+     * @param name The requester's name
+     * @param id The requester's UUID
+     */
     public static void handleTeamRequestedPacket(String name, UUID id) {
         Minecraft.getInstance().getToasts().addToast(new ToastRequested(ClientTeam.INSTANCE.getName(), name, id));
     }
 
+    /**
+     * Handles team invite sent packets from the server (invite was sent to player).
+     * @param team The team name
+     * @param player The invited player name
+     */
     public static void handleTeamInviteSentPacket(String team,String player) {
         Minecraft.getInstance().getToasts().addToast(new ToastInviteSent(team, player));
     }
 
+    /**
+     * Handles team player data packets from the server (add/update/remove players).
+     * @param tag The NBT tag containing player data
+     */
     public static void handleTeamPlayerDataPacket(CompoundTag tag) {
         UUID uuid = tag.getUUID(S2CTeamPlayerDataPacket.ID_KEY);
         S2CTeamPlayerDataPacket.Type type;
@@ -245,6 +342,10 @@ public class TeamsHUDClient {
         }
     }
 
+    /**
+     * Handles team invited packets from the server (received invite to team).
+     * @param team The team name
+     */
     public static void handleTeamInvitedPacket(String team) {
         Minecraft.getInstance().getToasts().addToast(new ToastInvited(team));
     }

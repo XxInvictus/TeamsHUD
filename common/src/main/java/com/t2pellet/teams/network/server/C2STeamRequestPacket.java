@@ -7,14 +7,27 @@ import com.t2pellet.teams.platform.Services;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
+/**
+ * Packet sent from client to server to request joining a team.
+ * The server notifies the most senior online team member of the request.
+ */
 public class C2STeamRequestPacket implements C2SModPacket {
 
 
     String name;
+    
+    /**
+     * Creates a new team request packet
+     * @param name The name of the team to request joining
+     */
     public C2STeamRequestPacket(String name) {
         this.name = name;
     }
 
+    /**
+     * Decode a team request packet from the network buffer
+     * @param byteBuf The buffer to read from
+     */
     public C2STeamRequestPacket(FriendlyByteBuf byteBuf) {
         name = byteBuf.readUtf();
     }
