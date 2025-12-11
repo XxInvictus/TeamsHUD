@@ -33,7 +33,7 @@ public abstract class RespondableTeamToast extends TeamToast {
     public String subTitle() {
         String rejectKey = TeamsKeys.REJECT.getLocalizedName();
         String acceptKey = TeamsKeys.ACCEPT.getLocalizedName();
-        return I18n.get("teams.toast.respond", rejectKey, acceptKey);
+        return I18n.get("teamshudplus.toast.respond", rejectKey, acceptKey);
     }
 
     @Override

@@ -21,11 +21,11 @@ public class ToastInviteSent extends TeamToast {
 
     @Override
     public String title() {
-        return I18n.get("teams.toast.invitesent");
+        return I18n.get("teamshudplus.toast.invitesent");
     }
 
     @Override
     public String subTitle() {
-        return I18n.get("teams.toast.invitesent.details", player);
+        return I18n.get("teamshudplus.toast.invitesent.details", player);
     }
 }

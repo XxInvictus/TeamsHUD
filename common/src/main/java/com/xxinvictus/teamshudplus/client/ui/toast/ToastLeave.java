@@ -24,11 +24,11 @@ public class ToastLeave extends TeamToast {
 
     @Override
     public String title() {
-        return local ? I18n.get("teams.toast.leave") : I18n.get("teams.toast.left");
+        return local ? I18n.get("teamshudplus.toast.leave") : I18n.get("teamshudplus.toast.left");
     }
 
     @Override
     public String subTitle() {
-        return local ? I18n.get("teams.toast.leave.details", team) : I18n.get("teams.toast.left.details", name);
+        return local ? I18n.get("teamshudplus.toast.leave.details", team) : I18n.get("teamshudplus.toast.left.details", name);
     }
 }

@@ -78,7 +78,7 @@ public class TeamCommand {
         ServerPlayer newPlayer = EntityArgument.getPlayer(ctx, "player");
         ModTeam team = ((IHasTeam) player).getTeam();
         if (team == null) {
-            throw new SimpleCommandExceptionType(ModComponents.translatable("teams.error.notinteam", player.getName().getString())).create();
+            throw new SimpleCommandExceptionType(ModComponents.translatable("teamshudplus.error.notinteam", player.getName().getString())).create();
         }
         try {
             get(ctx).invitePlayerToTeam(newPlayer, team);
@@ -113,15 +113,15 @@ public class TeamCommand {
         String name = ctx.getArgument("name", String.class);
         ModTeam team = TeamDB.getOrMakeDefault(ctx.getSource().getServer()).getTeam(name);
         if (team == null) {
-            throw new SimpleCommandExceptionType(ModComponents.translatable("teams.error.invalidteam", name)).create();
+            throw new SimpleCommandExceptionType(ModComponents.translatable("teamshudplus.error.invalidteam", name)).create();
         }
         get(ctx).removeTeam(team);
-        ctx.getSource().sendSuccess(() -> ModComponents.translatable("teams.success.remove", name), false);
+        ctx.getSource().sendSuccess(() -> ModComponents.translatable("teamshudplus.success.remove", name), false);
         return Command.SINGLE_SUCCESS;
     }
 
     private static int listTeams(CommandContext<CommandSourceStack> ctx) {
-        ctx.getSource().sendSuccess(() -> ModComponents.translatable("teams.success.list"), false);
+        ctx.getSource().sendSuccess(() -> ModComponents.translatable("teamshudplus.success.list"), false);
         get(ctx).getTeams().forEach(team -> ctx.getSource().sendSuccess(() -> ModComponents.literal(team.getName()), false));
         return Command.SINGLE_SUCCESS;
     }
@@ -130,9 +130,9 @@ public class TeamCommand {
         String name = ctx.getArgument("name", String.class);
         ModTeam team = get(ctx).getTeam(name);
         if (team == null) {
-            throw new SimpleCommandExceptionType(ModComponents.translatable("teams.error.invalidteam", name)).create();
+            throw new SimpleCommandExceptionType(ModComponents.translatable("teamshudplus.error.invalidteam", name)).create();
         }
-        ctx.getSource().sendSuccess(() -> ModComponents.translatable("teams.success.info", name), false);
+        ctx.getSource().sendSuccess(() -> ModComponents.translatable("teamshudplus.success.info", name), false);
         team.getOnlinePlayers().forEach(player -> ctx.getSource().sendSuccess(player::getName, false));
         return Command.SINGLE_SUCCESS;
     }

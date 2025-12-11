@@ -1,0 +1,303 @@
+name: Dev Build & Test
+
+on:
+  push:
+    branches:
+      - '1.20.1-dev'
+    paths:
+      - 'common/src/**'
+      - 'fabric/src/**'
+      - 'forge/src/**'
+      - 'gradle.properties'
+      - '**/build.gradle'
+      - 'settings.gradle'
+      - '.github/workflows/dev-build.yml'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - '1.20.1-dev'
+    paths:
+      - 'common/src/**'
+      - 'fabric/src/**'
+      - 'forge/src/**'
+      - 'gradle.properties'
+      - '**/build.gradle'
+      - 'settings.gradle'
+      - '.github/workflows/dev-build.yml'
+  workflow_dispatch:
+    inputs:
+      run_tests:
+        description: 'Run tests after build'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      test_type:
+        description: 'Which tests to run'
+        required: false
+        default: 'both'
+        type: choice
+        options:
+          - 'both'
+          - 'client'
+          - 'server'
+          - 'none'
+
+# Cancel in-progress runs when a new one is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Mod
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      minecraft_version: ${{ steps.properties.outputs.minecraft_version }}
+      mod_version: ${{ steps.properties.outputs.mod_version }}
+      mod_name: ${{ steps.properties.outputs.mod_name }}
+      mod_id: ${{ steps.properties.outputs.mod_id }}
+      fabric_loader_version: ${{ steps.properties.outputs.fabric_loader_version }}
+      forge_version: ${{ steps.properties.outputs.forge_version }}
+      fabric_matrix: ${{ steps.test_matrix.outputs.fabric }}
+      forge_matrix: ${{ steps.test_matrix.outputs.forge }}
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+      
+      - name: Grant Execute Permission to Gradlew
+        run: chmod +x gradlew
+      
+      - name: Cache Gradle Build Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches/build-cache-*
+          key: ${{ runner.os }}-gradle-buildcache-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-buildcache-
+      
+      - name: Extract Build Properties
+        id: properties
+        run: bash .github/scripts/extract-properties.sh --preset build
+      
+      - name: Determine Test Targets
+        id: test_matrix
+        run: |
+          set -euo pipefail
+          target_json='["client","server"]'
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            if [ "$RUN_TESTS_INPUT" != "true" ] || [ "$TEST_TYPE_INPUT" = "none" ]; then
+              target_json='[]'
+            elif [ "$TEST_TYPE_INPUT" = "client" ]; then
+              target_json='["client"]'
+            elif [ "$TEST_TYPE_INPUT" = "server" ]; then
+              target_json='["server"]'
+            fi
+          fi
+          echo "fabric=${target_json}" >> $GITHUB_OUTPUT
+          echo "forge=${target_json}" >> $GITHUB_OUTPUT
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          RUN_TESTS_INPUT: ${{ inputs.run_tests }}
+          TEST_TYPE_INPUT: ${{ inputs.test_type }}
+      
+      - name: Build with Gradle
+        run: ./gradlew build --no-daemon --build-cache --parallel
+        env:
+          GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: dev
+      - name: Check Forge Remap Status
+        id: forge_remap_check
+        run: bash .github/scripts/forge-remap.sh --action check
+      - name: Sync Forge Release Jar
+        if: steps.forge_remap_check.outputs.needs_sync == 'true'
+        run: ./gradlew :forge:syncReobfReleaseJar --no-daemon --build-cache --rerun-tasks
+        env:
+          GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: dev
+      - name: Validate Forge Release Jar Remapping
+        run: bash .github/scripts/forge-remap.sh --action validate
+      
+      - name: Prepare Artifacts for Upload
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          find fabric/build/libs -name '*-fabric-*.jar' ! -name '*-javadoc.jar' ! -name '*-sources.jar' -exec cp {} artifacts/ \; || true
+          find forge/build/libs -name '*-forge-*.jar' ! -name '*-javadoc.jar' ! -name '*-sources.jar' ! -name '*-dev.jar' -exec cp {} artifacts/ \; || true
+          if ! ls artifacts/*.jar >/dev/null 2>&1; then
+            echo "Error: No build artifacts were produced"
+            exit 1
+          fi
+          ls -la artifacts/
+      
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: artifacts/*.jar
+          retention-days: 3
+
+      - name: Upload Properties for Next Stages
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-properties
+          path: gradle.properties
+          retention-days: 1
+
+  test-fabric:
+    name: Test Fabric (${{ matrix.target }})
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        target: ${{ fromJson(needs.build.outputs.fabric_matrix) }}
+    if: ${{ needs.build.result == 'success' && (github.event_name != 'push' || github.ref == 'refs/heads/1.20.1-dev') && needs.build.outputs.fabric_matrix != '[]' }}
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Prepare Fabric Test Environment
+        id: prepare
+        uses: ./.github/actions/prepare-test-env
+        with:
+          property-preset: fabric-test
+      
+      - name: Download Dependencies
+        run: |
+          set -euo pipefail
+          mkdir -p run/mods
+          
+          # Ensure jq is available on the runner
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update -qq && sudo apt-get install -y -qq jq
+          fi
+          
+          minecraft_version="${{ steps.prepare.outputs.minecraft_version }}"
+          fabric_version="${{ steps.prepare.outputs.fabric_version }}"
+          cloth_config_version="${{ steps.prepare.outputs.cloth_config_version }}"
+          
+          # Download Fabric API
+          echo "Fetching Fabric API version info from Modrinth API..."
+          fabric_api_url="https://api.modrinth.com/v2/project/P7dR8mSH/version?loaders=%5B%22fabric%22%5D&game_versions=%5B%22${minecraft_version}%22%5D"
+          fabric_data=$(curl -sS "$fabric_api_url") || true
+          
+          fabric_file_url=$(printf '%s' "$fabric_data" | jq -r --arg ver "${fabric_version}" '([(.[] | select(.version_number == $ver) | .files[0].url), (.[] | select(.version_number | startswith($ver)) | .files[0].url)] | map(select(.!=null)) | .[0])')
+          
+          if [ -z "$fabric_file_url" ] || [ "$fabric_file_url" = "null" ]; then
+            echo "Error: Could not find Fabric API version ${fabric_version} for Minecraft ${minecraft_version}"
+            exit 1
+          fi
+          
+          echo "Downloading Fabric API from ${fabric_file_url}"
+          curl -L -f -o "run/mods/fabric-api.jar" "${fabric_file_url}"
+          
+          # Download Cloth Config
+          echo "Fetching Cloth Config version info from Modrinth API..."
+          cloth_api_url="https://api.modrinth.com/v2/project/9s6osm5g/version?loaders=%5B%22fabric%22%5D&game_versions=%5B%22${minecraft_version}%22%5D"
+          cloth_data=$(curl -sS "$cloth_api_url") || true
+          
+          cloth_file_url=$(printf '%s' "$cloth_data" | jq -r --arg cloth "${cloth_config_version}+fabric" '([(.[] | select(.version_number == $cloth) | .files[0].url), (.[] | select(.version_number | startswith($cloth)) | .files[0].url)] | map(select(.!=null)) | .[0])')
+          
+          if [ -z "$cloth_file_url" ] || [ "$cloth_file_url" = "null" ]; then
+            echo "Error: Could not find Cloth Config version ${cloth_config_version} for Minecraft ${minecraft_version}"
+            exit 1
+          fi
+          
+          echo "Downloading Cloth Config from ${cloth_file_url}"
+          curl -L -f -o "run/mods/cloth-config.jar" "${cloth_file_url}"
+      
+      - name: Prepare Test Environment
+        run: |
+          echo "Downloaded artifacts:"
+          ls -la build/libs/
+          find build/libs -name '*-fabric-*.jar' ! -name '*-javadoc.jar' ! -name '*-sources.jar' -exec cp {} run/mods/ \;
+          echo "Mods directory:"
+          ls -la run/mods/
+          echo "Checking for refmap in JAR:"
+          jar tf run/mods/*.jar | grep -i refmap || echo "No refmap found in JAR"
+          echo "Checking mixin JSON contents:"
+          unzip -p run/mods/*.jar teamshudplus.mixins.json | head -20 || echo "Could not extract mixin JSON"
+      
+      - name: Run Fabric ${{ matrix.target }} Test
+        uses: headlesshq/mc-runtime-test@4.1.0
+        with:
+          java: '17'
+          mc: ${{ steps.prepare.outputs.minecraft_version }}
+          modloader: fabric
+          regex: '.*fabric.*'
+          mc-runtime-test: fabric
+
+  test-forge:
+    name: Test Forge (${{ matrix.target }})
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        target: ${{ fromJson(needs.build.outputs.forge_matrix) }}
+    if: ${{ needs.build.result == 'success' && (github.event_name != 'push' || github.ref == 'refs/heads/1.20.1-dev') && needs.build.outputs.forge_matrix != '[]' }}
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Prepare Forge Test Environment
+        id: prepare
+        uses: ./.github/actions/prepare-test-env
+        with:
+          property-preset: forge-test
+      
+      - name: Prepare Test Environment
+        run: |
+          set -euo pipefail
+          echo "Downloaded release artifacts:"
+          ls -la build/libs/ || true
+          rm -rf run/mods
+          mkdir -p run/mods
+          find build/libs -name '*-forge-*.jar' ! -name '*-javadoc.jar' ! -name '*-sources.jar' ! -name '*-dev.jar' -exec cp {} run/mods/ \;
+          if ! ls run/mods/*-forge-*.jar >/dev/null 2>&1; then
+            echo "Error: Forge release jar not found in build/libs"
+            ls -la run/mods/
+            exit 1
+          fi
+          echo "Mods directory:"
+          ls -la run/mods/
+          echo "Checking for refmap in release jar:"
+          if ! jar tf run/mods/*-forge-*.jar | grep -i refmap; then
+            echo "Error: refmap missing from release jar"
+            exit 1
+          fi
+      
+      - name: Run Forge ${{ matrix.target }} Test
+        uses: headlesshq/mc-runtime-test@4.1.0
+        with:
+          java: '17'
+          mc: ${{ steps.prepare.outputs.minecraft_version }}
+          modloader: forge
+          regex: '.*forge.*'
+          mc-runtime-test: lexforge
+
+  cleanup:
+    name: Cleanup Artifacts
+    needs: [build, test-fabric, test-forge]
+    if: always() && vars.DEBUG_MODE == 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: Delete Build Artifacts
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: |
+            build-artifacts
+            gradle-properties
+          failOnError: false

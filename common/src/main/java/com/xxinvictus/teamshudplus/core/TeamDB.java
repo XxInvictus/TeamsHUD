@@ -77,10 +77,10 @@ public class TeamDB extends SavedData {
      */
     public ModTeam addTeam(String name, @Nullable ServerPlayer creator) throws ModTeam.TeamException {
         if (name == null || name.trim().isEmpty()) {
-            throw new ModTeam.TeamException(ModComponents.translatable("teams.error.invalidname"));
+            throw new ModTeam.TeamException(ModComponents.translatable("teamshudplus.error.invalidname"));
         }
         if (creator != null && ((IHasTeam) creator).hasTeam()) {
-            throw new ModTeam.TeamException(ModComponents.translatable("teams.error.alreadyinteam", creator.getName().getString()));
+            throw new ModTeam.TeamException(ModComponents.translatable("teamshudplus.error.alreadyinteam", creator.getName().getString()));
         }
         ModTeam team = new ModTeam.Builder(name).complete(this);
         addTeam(team);
@@ -150,7 +150,7 @@ public class TeamDB extends SavedData {
      */
     public void invitePlayerToTeam(ServerPlayer player, ModTeam team) throws ModTeam.TeamException {
         if (((IHasTeam) player).hasTeam()) {
-            throw new ModTeam.TeamException(ModComponents.translatable("teams.error.alreadyinteam", player.getName().getString()));
+            throw new ModTeam.TeamException(ModComponents.translatable("teamshudplus.error.alreadyinteam", player.getName().getString()));
         }
         Services.PLATFORM.sendToClient(new S2CTeamInvitedPacket(team), player);
     }
@@ -163,7 +163,7 @@ public class TeamDB extends SavedData {
      */
     public void addPlayerToTeam(ServerPlayer player, ModTeam team) throws ModTeam.TeamException {
         if (((IHasTeam) player).hasTeam()) {
-            throw new ModTeam.TeamException(ModComponents.translatable("teams.error.alreadyinteam", player.getName()));
+            throw new ModTeam.TeamException(ModComponents.translatable("teamshudplus.error.alreadyinteam", player.getName()));
         }
         team.addPlayer(player);
     }
@@ -176,7 +176,7 @@ public class TeamDB extends SavedData {
     public void removePlayerFromTeam(ServerPlayer player) throws ModTeam.TeamException {
         ModTeam playerTeam = ((IHasTeam) player).getTeam();
         if (playerTeam == null) {
-            throw new ModTeam.TeamException(ModComponents.translatable("teams.error.notinteam", player.getName().getString()));
+            throw new ModTeam.TeamException(ModComponents.translatable("teamshudplus.error.notinteam", player.getName().getString()));
         }
         playerTeam.removePlayer(player);
         if (playerTeam.isEmpty()) {

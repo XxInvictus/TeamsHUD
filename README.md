@@ -1,116 +1,149 @@
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0) [![Static Badge](https://img.shields.io/badge/github-repo-blue?logo=github&link=https%3A%2F%2Fgithub.com%2FXxInvictus%2FTeamsHUDPlus)](https://github.com/XxInvictus/TeamsHUDPlus) [![Dev Build & Test](https://github.com/XxInvictus/TeamsHUDPlus/actions/workflows/dev-build.yml/badge.svg?branch=1.20.1-dev)](https://github.com/XxInvictus/TeamsHUDPlus/actions/workflows/dev-build.yml) [![Release Build & Publish](https://github.com/XxInvictus/TeamsHUDPlus/actions/workflows/release.yml/badge.svg)](https://github.com/XxInvictus/TeamsHUDPlus/actions/workflows/release.yml)  
+[![Static Badge](https://img.shields.io/badge/Get%20on%20Curseforge-link-chocolate?logo=curseforge&link=https%3A%2F%2Fwww.curseforge.com%2Fminecraft%2Fmc-mods%2Fteams-hud-plus)](https://www.curseforge.com/minecraft/mc-mods/teams-hud-plus)
+ [![Static Badge](https://img.shields.io/badge/Get%20on%20Modrinth-link-forestgreen?logo=modrinth&link=https%3A%2F%2Fmodrinth.com%2Fmod%2Fteams-hud-plus)](https://modrinth.com/mod/teams-hud-plus)
+
 # TeamsHUDPlus
 
-A Minecraft mod that adds team management functionality with visual HUD elements for both Forge and Fabric mod loaders. Continuation of the work by Tfarcenim (TeamsHUD) and CommodoreThrawn (Teams) with additional functionality I wish they had. I have raised Pull Requests against the TeamsHUD source for these features and may still scrap this continuation if they get accepted and merged into that mod.
+**A Minecraft mod for seamless team management and real-time teammate HUD overlays.**
+
+TeamsHUDPlus is a continuation and expansion of the original TeamsHUD and Teams mods, providing:
+
+- Intuitive team creation and management
+- Visual compass and status HUDs
+- Server-enforced limits and migration helpers
+
+---
+
+## User Guide
 
 ## Features
 
 ### Team Management
-- **Create and manage teams**: Form teams with other players
-- **Player invitations**: Send and accept team invitations via toast notifications
+
+- **Create and manage teams**: Form and manage teams with other players
+- **Player invitations**: Send/accept team invites via toast notifications
 - **Join requests**: Request to join existing teams
-- **Team permissions**: Designate team leaders with management permissions
-- **Player kicking**: Remove players from teams (requires permissions)
+- **Team permissions**: Assign leaders with management rights
+- **Player kicking**: Remove players (with permission)
 
 ### HUD Elements
-- **Compass HUD**: Visual compass showing teammate locations and distances
-- **Status HUD**: Display teammate health and hunger levels in real-time
-- **Configurable detection distance**: Customize how far teammates can be detected
+
+- **Compass HUD**: Visual compass showing teammate locations/distances
+- **Status HUD**: Real-time teammate health and hunger
+- **Configurable detection distance**: Set how far teammates are detected
 - **Toggle visibility**: Enable/disable HUD elements on the fly
+- **Server-enforced compass limits**: Admins can set max detection range
+
+### Migration & Compatibility
+
+- **Automatic config migration**: Copies legacy Teams configs on first launch
 
 ### Keybindings
-- **Accept** (Right Bracket `]`): Accept team invitations or join requests
-- **Reject** (Left Bracket `[`): Reject team invitations or join requests  
-- **Toggle HUD** (B): Toggle compass and status HUD visibility
-- **Toggle HUD Lock** (L): Lock/unlock HUD positioning (opens drag mode when unlocked)
+
+- **Accept** (`]`): Accept invites/requests
+- **Reject** (`[`): Reject invites/requests
+- **Toggle HUD** (`B`): Show/hide compass and status HUD
+- **Toggle HUD Lock** (`L`): Lock/unlock HUD positioning (drag mode)
 
 ### HUD Customization
-- **Lock/Unlock HUD**: Press **L** or use the button in the Teams menu to toggle HUD lock
-  - When **unlocked**: A transparent overlay appears allowing you to drag HUD elements
-  - White borders appear around draggable elements
-  - Click and drag the Status HUD or Compass HUD to reposition them
-  - Press **ESC** or **L** to exit drag mode and lock the HUD
-- **Scale HUD Elements**: Configure scaling from 0.1x (10%) to 3.0x (300%) in the mod settings
-  - Adjust `statusOverlayScale` and `compassOverlayScale` in config files
-  - Default scale: 1.0 (100%)
-- **Position Persistence**: HUD positions and scales are saved to your config file
-- **Drag Mode Tips**:
-  - Drag indicator turns green when actively dragging an element
-  - Both overlays can be positioned independently
-  - Works with scaled overlays
+
+- **Lock/Unlock HUD**: Press `L` or use Teams menu
+  - Drag overlays when unlocked (white borders)
+  - Click/drag to reposition; press `ESC`/`L` to lock
+- **Scale HUD elements**: 0.1x–3.0x (configurable)
+  - Adjust `statusOverlayScale`/`compassOverlayScale` in config
+- **Position persistence**: HUD positions/scales saved to config
+- **Drag mode tips**: Green indicator when dragging; overlays move independently
 
 ### Configuration Options
-- Show invisible teammates
-- Name tag visibility settings
-- Death message visibility settings
-- Collision rules
-- Compass HUD enable/disable
-- Status HUD enable/disable
-- Compass detection distance
-- **Distance Counter**: Show real-time distance to teammates
-  - Enable/disable teammate distance display
-  - Configurable update frequency (1-200 ticks)
-  - Option to show distance only within compass range
+
+Configuration is split into **Server** (admin) and **Client** (user) settings. Most options are available in the in-game mod config menu or as TOML files.
+
+#### Server (admin-controlled, affects all players)
+
+- `show_invisible_teammates` (default: true): Allow teammates to see each other when invisible
+- `friendly_fire_enabled` (default: false): Allow teammates to damage each other
+- `name_tag_visibility` (default: ALWAYS): Control when team name tags are visible
+- `colour` (default: BOLD): Team color formatting
+- `death_message_visibility` (default: ALWAYS): Control when death messages are shown
+- `collision_rule` (default: PUSH_OWN_TEAM): Set collision rules for team members
+- `sync_advancements` (default: true): Sync advancements between team members
+- `max_compass_detection_distance` (default: 512, min: 16, max: 2048): Maximum allowed compass detection distance (clients cannot exceed this)
+
+#### Client (per-user, visual and HUD options)
+
+- `enable_compass_hud` (default: true): Show/hide the compass HUD
+- `enable_status_hud` (default: true): Show/hide the status HUD
+- `toast_duration` (default: 5): Duration of team toast notifications (seconds)
+- `show_hunger` (default: true): Show other team members' hunger bars
+- `compass_detection_distance` (default: 128, min: 16, max: 1024): Maximum detection distance for compass HUD (cannot exceed server max)
+
+**HUD Positioning:**
+
+- `status_overlay_x` / `status_overlay_y` (default: -1): X/Y position of status HUD (-1 = default/auto)
+- `compass_overlay_x` / `compass_overlay_y` (default: -1): X/Y position of compass HUD (-1 = default/auto)
+- `status_overlay_scale` (default: 1.0, min: 0.1, max: 3.0): Scale of status HUD
+- `compass_overlay_scale` (default: 1.0, min: 0.1, max: 3.0): Scale of compass HUD
+
+**Distance Counter:**
+
+- `show_teammate_distance` (default: false): Show distance to teammates next to their names
+- `teammate_distance_update_frequency` (default: 20, min: 1, max: 200): How often to update teammate distances (in ticks)
+- `distance_only_within_compass_range` (default: false): Only show distance if teammate is within compass detection range
 
 ## Installation
 
-### Prerequisites
-- Minecraft 1.20.1
-- Java 17 or higher
-- **Forge**: Version 47.4.0 or higher
-- **Fabric**: Fabric Loader 0.18.1+ and Fabric API 0.92.6+
-
 ### Steps
-1. Download the appropriate version for your mod loader (Forge or Fabric)
-2. Place the downloaded JAR file in your Minecraft `mods` folder
-3. Launch Minecraft with the corresponding mod loader
-4. Configure keybindings and settings in the game options menu
+
+1. Download the correct version for Forge or Fabric
+2. Place the JAR in your `mods` folder
+3. Launch Minecraft with the chosen loader
+4. Configure keybindings/settings in game options
+
 
 ## Usage
 
 ### Creating a Team
-1. Open the teams screen using the mod's interface
-2. Create a new team with a custom name
+
+1. Open the Teams screen
+2. Create a team with a custom name
 3. Invite players by username
 
 ### Joining a Team
-1. Receive a team invitation via toast notification
-2. Press the **Accept** key (Right Bracket) to join
-3. Or press the **Reject** key (Left Bracket) to decline
+
+1. Receive a team invite (toast notification)
+2. Press `]` to accept, `[` to reject
 
 ### Managing Team Members
-- Team leaders can invite new members
-- Team leaders can kick members
-- Players can leave teams at any time
+
+- Leaders can invite/kick members
+- Players can leave teams anytime
 
 ### Using the HUD
-- The compass HUD shows directional indicators to teammates
-- The status HUD displays real-time health and hunger information
-- Press **Toggle HUD** (B) to show/hide HUD elements
-- Configure detection distance and visibility in mod settings
 
-### Distance Tracking
-- **Real-time distance display**: Shows distance to teammates next to their names (e.g., "PlayerName - 123m")
-- **Configurable updates**: Set update frequency from 1-200 ticks (default: 20 ticks/1 second)
-  - Higher values = better performance, lower accuracy
-  - Lower values = more accurate, slight performance impact
-- **Compass range filtering**: Option to only show distance for teammates within compass detection range
-- **Automatic handling**: Distances automatically hide for dead teammates or those in unloaded chunks
-- **Configuration**: Enable in mod settings (`show_teammate_distance`, `teammate_distance_update_frequency`, `distance_only_within_compass_range`)
-- **Format**: Horizontal distance (X-Z plane) displayed in meters
+- Compass HUD: Shows teammate directions
+- Status HUD: Real-time health/hunger and teammate distance (distance shown next to names, e.g., `PlayerName - 123m`)
+- Press `B` to toggle HUD, configure in mod settings
 
-## Building from Source
+---
 
-This project uses a MultiLoader template supporting both Forge and Fabric.
+## Development Guide
 
-### IntelliJ IDEA
+### Building from Source
+
+This project uses a MultiLoader template (Forge & Fabric).
+
+#### IntelliJ IDEA
+
 1. Clone this repository
-2. Import as a Gradle project in IntelliJ IDEA
+2. Import as a Gradle project
 3. Set Project SDK to Java 17
-4. Navigate to Gradle panel > Common > Tasks > vanilla gradle > decompile
-5. Navigate to Gradle panel > Forge > Tasks > forgegradle runs > genIntellijRuns
-6. Run configurations for both Forge and Fabric will be available
+4. In Gradle panel: `Common > Tasks > vanilla gradle > decompile`
+5. In Gradle panel: `Forge > Tasks > forgegradle runs > genIntellijRuns`
+6. Run configs for Forge and Fabric will appear
 
-### Build Commands
+#### Build Commands
+
 ```bash
 # Build all versions
 ./gradlew build
@@ -125,29 +158,36 @@ This project uses a MultiLoader template supporting both Forge and Fabric.
 ./gradlew check
 ```
 
-Built JARs will be located in:
+Built JARs:
+
 - Forge: `forge/build/libs/`
 - Fabric: `fabric/build/libs/`
 
-## License
+### Architecture
 
-This project is licensed under the GNU Affero General Public License v3.0 - see the [LICENSE.md](LICENSE.md) file for details.
+- Minecraft 1.20.1
+- Java 17 or higher
+- **Forge**: 47.4.0+
+- **Fabric**: Loader 0.18.1+ & Fabric API 0.92.6+
 
-## Authors
+#### Folder Structure
+
+- **Common**: Shared code (vanilla Minecraft)
+- **Forge**: Forge-specific code
+- **Fabric**: Fabric-specific code
+
+Network packets handle client-server sync for team data/player updates.
+
+### License
+
+This project is licensed under the GNU Affero General Public License v3.0 – see [LICENSE.md](LICENSE.md).
+
+### Authors
 
 - XxInvictus (TeamsHUDPlus)
 - Tfarcenim ([TeamsHUD](https://www.curseforge.com/minecraft/mc-mods/teams-hud))
 - CommodoreThrawn ([Teams](https://www.curseforge.com/minecraft/mc-mods/teams))
 
-## Changelog
+### Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for a detailed version history.
-
-## Development
-
-The mod uses a common sourceset architecture:
-- **Common**: Shared code compiled against vanilla Minecraft
-- **Forge**: Forge-specific implementations
-- **Fabric**: Fabric-specific implementations
-
-Network packets handle client-server synchronization for team data and player updates.
+See [CHANGELOG.md](CHANGELOG.md) for version history.

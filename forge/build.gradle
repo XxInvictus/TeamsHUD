@@ -1,3 +1,7 @@
+import org.gradle.api.file.DuplicatesStrategy
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+
 plugins {
     id 'idea'
     id 'maven-publish'
@@ -6,7 +10,7 @@ plugins {
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 base {
-    archivesName = "${mod_name}-forge-${minecraft_version}"
+    archivesName = "${mod_name}-forge-${minecraft_version}-${mod_version}"
 }
 mixin {
     add(sourceSets.main, "${mod_id}.refmap.json")
@@ -89,6 +93,11 @@ dependencies {
 tasks.withType(JavaCompile).configureEach {
     source(project(":common").sourceSets.main.allSource)
 }
+
+tasks.named("compileJava", JavaCompile).configure {
+    outputs.file(layout.buildDirectory.file("tmp/compileJava/${mod_id}.refmap.json"))
+    outputs.file(layout.buildDirectory.file("tmp/compileJava/compileJava-refmap.json"))
+}
 tasks.withType(Javadoc).configureEach {
     source(project(":common").sourceSets.main.allJava)
 }
@@ -100,7 +109,46 @@ processResources {
     from project(":common").sourceSets.main.resources
 }
 
-jar.finalizedBy('reobfJar')
+tasks.named("jar", Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+afterEvaluate {
+    def reobfTask = tasks.named("reobfJar")
+    def jarTask = tasks.named("jar")
+
+    // This is an oddity of the multi-loader build in Github Actions.
+    // Without this, the Forge jar does not get the reobf applied before being published.
+    def syncReobfReleaseJar = tasks.register("syncReobfReleaseJar") {
+        group = "build"
+        description = "Ensures the Forge release jar matches the latest reobfuscated output"
+        dependsOn(reobfTask)
+        inputs.file(layout.buildDirectory.file("reobfJar/output.jar"))
+        outputs.file(jarTask.flatMap { it.archiveFile })
+        doLast {
+            def reobfOutput = layout.buildDirectory.file("reobfJar/output.jar").get().asFile
+            def releaseJar = jarTask.flatMap { it.archiveFile }.get().asFile
+            if (!reobfOutput.exists()) {
+                throw new GradleException("Reobf output not found at ${reobfOutput}")
+            }
+            Files.createDirectories(releaseJar.parentFile.toPath())
+            Files.copy(reobfOutput.toPath(), releaseJar.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        }
+    }
+
+    reobfTask.configure {
+        outputs.upToDateWhen { false }
+        outputs.cacheIf { false }
+    }
+
+    jarTask.configure {
+        finalizedBy(syncReobfReleaseJar)
+    }
+
+    tasks.named("build") {
+        dependsOn(syncReobfReleaseJar)
+    }
+}
 
 publishing {
     publications {
