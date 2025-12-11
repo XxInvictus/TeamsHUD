@@ -117,6 +117,8 @@ afterEvaluate {
     def reobfTask = tasks.named("reobfJar")
     def jarTask = tasks.named("jar")
 
+    // This is an oddity of the multi-loader build in Github Actions.
+    // Without this, the Forge jar does not get the reobf applied before being published.
     def syncReobfReleaseJar = tasks.register("syncReobfReleaseJar") {
         group = "build"
         description = "Ensures the Forge release jar matches the latest reobfuscated output"

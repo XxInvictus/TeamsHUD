@@ -286,19 +286,18 @@ jobs:
           regex: '.*forge.*'
           mc-runtime-test: lexforge
 
-# cleanup job temporarily disabled to preserve artifacts for debugging
-#  cleanup:
-#    name: Cleanup Artifacts
-#    needs: [build, test-fabric, test-forge]
-#    if: always()
-#    runs-on: ubuntu-latest
-#    timeout-minutes: 5
-#    
-#    steps:
-#      - name: Delete Build Artifacts
-#        uses: geekyeggo/delete-artifact@v5
-#        with:
-#          name: |
-#            build-artifacts
-#            gradle-properties
-#          failOnError: false
+  cleanup:
+    name: Cleanup Artifacts
+    needs: [build, test-fabric, test-forge]
+    if: always() && vars.DEBUG_MODE == 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: Delete Build Artifacts
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: |
+            build-artifacts
+            gradle-properties
+          failOnError: false

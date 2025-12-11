@@ -454,7 +454,7 @@ jobs:
   cleanup:
     name: Cleanup Artifacts
     needs: [build, release, publish]
-    if: always() && (needs.publish.result == 'success' || needs.publish.result == 'failure')
+    if: always() && (needs.publish.result == 'success' || needs.publish.result == 'failure') && vars.DEBUG_MODE == 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     
