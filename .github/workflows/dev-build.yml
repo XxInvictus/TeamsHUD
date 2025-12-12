@@ -196,7 +196,12 @@ jobs:
           
           # Ensure jq is available on the runner
           if ! command -v jq >/dev/null 2>&1; then
-            sudo apt-get update -qq && sudo apt-get install -y -qq jq
+            apt-get update -qq && apt-get install -y -qq jq
+          fi
+
+          # Ensure curl is available on the runner
+          if ! command -v curl >/dev/null 2>&1; then
+            apt-get update -qq && apt-get install -y -qq curl
           fi
           
           minecraft_version="${{ steps.prepare.outputs.minecraft_version }}"
@@ -254,6 +259,7 @@ jobs:
           modloader: fabric
           regex: '.*fabric.*'
           mc-runtime-test: fabric
+          xvfb: false
 
   test-forge:
     name: Test Forge (${{ matrix.target }})
@@ -308,6 +314,7 @@ jobs:
           modloader: forge
           regex: '.*forge.*'
           mc-runtime-test: lexforge
+          xvfb: false
 
   cleanup:
     name: Cleanup Artifacts
