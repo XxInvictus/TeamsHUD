@@ -58,6 +58,7 @@ jobs:
       image: ubuntu:latest
       env:
         LANG: C.UTF-8
+      options: -u 1001
     outputs:
       minecraft_version: ${{ steps.properties.outputs.minecraft_version }}
       mod_version: ${{ steps.properties.outputs.mod_version }}
@@ -172,6 +173,7 @@ jobs:
       image: ubuntu:latest
       env:
         LANG: C.UTF-8
+      options: -u 1001
     strategy:
       matrix:
         target: ${{ fromJson(needs.build.outputs.fabric_matrix) }}
@@ -261,6 +263,7 @@ jobs:
       image: ubuntu:latest
       env:
         LANG: C.UTF-8
+      options: -u 1001
     strategy:
       matrix:
         target: ${{ fromJson(needs.build.outputs.forge_matrix) }}
@@ -315,6 +318,7 @@ jobs:
       image: ubuntu:latest
       env:
         LANG: C.UTF-8
+      options: -u 1001
     
     steps:
       - name: Delete Build Artifacts
