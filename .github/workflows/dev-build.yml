@@ -53,7 +53,7 @@ concurrency:
 jobs:
   build:
     name: Build Mod
-    runs-on: ubuntu-latest
+    runs-on: HomeServ
     timeout-minutes: 5
     outputs:
       minecraft_version: ${{ steps.properties.outputs.minecraft_version }}
@@ -156,7 +156,7 @@ jobs:
   test-fabric:
     name: Test Fabric (${{ matrix.target }})
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: HomeServ
     timeout-minutes: 5
     strategy:
       matrix:
@@ -240,7 +240,7 @@ jobs:
   test-forge:
     name: Test Forge (${{ matrix.target }})
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: HomeServ
     timeout-minutes: 5
     strategy:
       matrix:
@@ -290,7 +290,7 @@ jobs:
     name: Cleanup Artifacts
     needs: [build, test-fabric, test-forge]
     if: always() && vars.DEBUG_MODE == 'false'
-    runs-on: ubuntu-latest
+    runs-on: HomeServ
     timeout-minutes: 5
     
     steps:
