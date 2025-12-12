@@ -54,6 +54,8 @@ jobs:
   build:
     name: Build Mod
     runs-on: HomeServ
+    container:
+      image: ubuntu:latest
     outputs:
       minecraft_version: ${{ steps.properties.outputs.minecraft_version }}
       mod_version: ${{ steps.properties.outputs.mod_version }}
@@ -156,6 +158,8 @@ jobs:
     name: Test Fabric (${{ matrix.target }})
     needs: build
     runs-on: HomeServ
+    container:
+      image: ubuntu:latest
     strategy:
       matrix:
         target: ${{ fromJson(needs.build.outputs.fabric_matrix) }}
@@ -239,6 +243,8 @@ jobs:
     name: Test Forge (${{ matrix.target }})
     needs: build
     runs-on: HomeServ
+    container:
+      image: ubuntu:latest
     strategy:
       matrix:
         target: ${{ fromJson(needs.build.outputs.forge_matrix) }}
@@ -288,6 +294,8 @@ jobs:
     needs: [build, test-fabric, test-forge]
     if: always() && vars.DEBUG_MODE == 'false'
     runs-on: HomeServ
+    container:
+      image: ubuntu:latest
     
     steps:
       - name: Delete Build Artifacts
