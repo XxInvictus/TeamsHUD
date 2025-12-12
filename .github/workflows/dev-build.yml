@@ -78,6 +78,7 @@ jobs:
           cache: 'gradle'
       
       - name: Grant Execute Permission to Gradlew
+        shell: bash
         run: chmod +x gradlew
       
       - name: Cache Gradle Build Cache
@@ -90,6 +91,7 @@ jobs:
       
       - name: Extract Build Properties
         id: properties
+        shell: bash
         run: bash .github/scripts/extract-properties.sh --preset build
       
       - name: Determine Test Targets
@@ -115,18 +117,22 @@ jobs:
           TEST_TYPE_INPUT: ${{ inputs.test_type }}
       
       - name: Build with Gradle
+        shell: bash
         run: ./gradlew build --no-daemon --build-cache --parallel
         env:
           GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: dev
       - name: Check Forge Remap Status
         id: forge_remap_check
+        shell: bash
         run: bash .github/scripts/forge-remap.sh --action check
       - name: Sync Forge Release Jar
         if: steps.forge_remap_check.outputs.needs_sync == 'true'
+        shell: bash
         run: ./gradlew :forge:syncReobfReleaseJar --no-daemon --build-cache --rerun-tasks
         env:
           GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: dev
       - name: Validate Forge Release Jar Remapping
+        shell: bash
         run: bash .github/scripts/forge-remap.sh --action validate
       
       - name: Prepare Artifacts for Upload
