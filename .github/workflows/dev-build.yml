@@ -94,6 +94,7 @@ jobs:
       
       - name: Determine Test Targets
         id: test_matrix
+        shell: bash
         run: |
           set -euo pipefail
           target_json='["client","server"]'
@@ -129,6 +130,7 @@ jobs:
         run: bash .github/scripts/forge-remap.sh --action validate
       
       - name: Prepare Artifacts for Upload
+        shell: bash
         run: |
           set -euo pipefail
           mkdir -p artifacts
@@ -175,6 +177,7 @@ jobs:
           property-preset: fabric-test
       
       - name: Download Dependencies
+        shell: bash
         run: |
           set -euo pipefail
           mkdir -p run/mods
@@ -219,6 +222,7 @@ jobs:
           curl -L -f -o "run/mods/cloth-config.jar" "${cloth_file_url}"
       
       - name: Prepare Test Environment
+        shell: bash
         run: |
           echo "Downloaded artifacts:"
           ls -la build/libs/
@@ -260,7 +264,8 @@ jobs:
           property-preset: forge-test
       
       - name: Prepare Test Environment
-        run: |
+        shell: bash
+        run:  |
           set -euo pipefail
           echo "Downloaded release artifacts:"
           ls -la build/libs/ || true
