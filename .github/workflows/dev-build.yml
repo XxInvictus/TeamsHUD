@@ -282,7 +282,7 @@ jobs:
           modloader: forge
           regex: '.*forge.*'
           mc-runtime-test: lexforge
-          headlessmc-command: -Dhmc.loglevel=INFO
+          headlessmc-command: -Dhmc.loglevel="DEBUG"
 
   cleanup:
     name: Cleanup Artifacts
