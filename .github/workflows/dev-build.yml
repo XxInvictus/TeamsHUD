@@ -359,7 +359,7 @@ jobs:
           java: '17'
           mc: ${{ steps.prepare.outputs.minecraft_version }}
           modloader: forge
-          regex: .*forge.*
+          regex: TeamsHUDPlus.*
           mc-runtime-test: lexforge
           headlessmc-command: -Dhmc.loglevel="DEBUG"
       
