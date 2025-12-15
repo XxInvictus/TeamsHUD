@@ -359,14 +359,14 @@ jobs:
           java: '17'
           mc: ${{ steps.prepare.outputs.minecraft_version }}
           modloader: forge
-          regex: '.*forge.*'
+          regex: .*forge.*
           mc-runtime-test: lexforge
           headlessmc-command: -Dhmc.loglevel="DEBUG"
       
       - name: Run Forge ${{ matrix.target }} Test without XVFB
         
         uses: headlesshq/mc-runtime-test@4.1.0
-        if: steps.run_forge_test.outcome == 'failure'
+        if: failure() &&steps.run_forge_test.outcome == 'failure'
         with:
           java: '17'
           mc: ${{ steps.prepare.outputs.minecraft_version }}
