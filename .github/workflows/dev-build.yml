@@ -331,9 +331,30 @@ jobs:
             echo "Error: refmap missing from release jar"
             exit 1
           fi
+
+      - name: Pre-Forge In-Flight Checks
+        if: vars.DEBUG_MODE == 'true'
+        run: |
+          set -euo pipefail
+          echo "Output working directory:"
+          pwd
+          echo "Listing build/libs contents:"
+          ls -la build/libs/
+          echo "Listing current directory contents:"
+          ls -la .
+          echo "Listing run/mods contents:"
+          ls -la run/mods/
+          echo "Verifying Forge jar presence:"
+          if ! ls run/mods/*-forge-*.jar >/dev/null 2>&1; then
+            echo "Error: Forge jar not found in run/mods"
+            exit 1
+          fi
+          # echo "Checking mixin JSON contents:"
+          # unzip -p run/mods/*-forge-*.jar teamshudplus.mixins.json | head -20 || echo "Could not extract mixin JSON"
       
       - name: Run Forge ${{ matrix.target }} Test
         uses: headlesshq/mc-runtime-test@4.1.0
+        id: run_forge_test
         with:
           java: '17'
           mc: ${{ steps.prepare.outputs.minecraft_version }}
@@ -341,6 +362,19 @@ jobs:
           regex: '.*forge.*'
           mc-runtime-test: lexforge
           headlessmc-command: -Dhmc.loglevel="DEBUG"
+      
+      - name: Run Forge ${{ matrix.target }} Test without XVFB
+        
+        uses: headlesshq/mc-runtime-test@4.1.0
+        if: steps.run_forge_test.outcome == 'failure'
+        with:
+          java: '17'
+          mc: ${{ steps.prepare.outputs.minecraft_version }}
+          modloader: forge
+          regex: '.*forge.*'
+          mc-runtime-test: lexforge
+          headlessmc-command: -Dhmc.loglevel="DEBUG"
+          xvfb: 'false'
 
   cleanup:
     name: Cleanup Artifacts
