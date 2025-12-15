@@ -164,6 +164,35 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - name: Cleanup Test Directories
+        run: |
+          # Archive and remove all test artifacts (run/mods and build/libs), regardless of type
+          if [ -d "run/mods" ]; then
+            if [ "${{ vars.DEBUG_MODE }}" = "true" ]; then
+              mkdir -p debug-archive/fabric
+              cp -r run debug-archive/fabric/ || true
+              echo "Archived run/ directory to debug-archive/fabric/"
+            fi
+            rm -rf run/mods
+            echo "Cleaned up run/mods directory."
+          fi
+          if [ -d "build/libs" ]; then
+            if [ "${{ vars.DEBUG_MODE }}" = "true" ]; then
+              mkdir -p debug-archive/fabric
+              cp -r build/libs debug-archive/fabric/ || true
+              echo "Archived build/libs to debug-archive/fabric/"
+            fi
+            rm -rf build/libs
+            echo "Cleaned up build/libs directory."
+          fi
+        shell: bash
+      - name: Upload Fabric Debug Archive
+        if: vars.DEBUG_MODE == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: fabric-debug-archive
+          path: debug-archive/fabric/
+          retention-days: 3
       - name: Prepare Fabric Test Environment
         id: prepare
         uses: ./.github/actions/prepare-test-env
@@ -247,6 +276,35 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - name: Cleanup Test Directories
+        run: |
+          # Archive and remove all test artifacts (run/mods and build/libs), regardless of type
+          if [ -d "run/mods" ]; then
+            if [ "${{ vars.DEBUG_MODE }}" = "true" ]; then
+              mkdir -p debug-archive/forge
+              cp -r run debug-archive/forge/ || true
+              echo "Archived run/ directory to debug-archive/forge/"
+            fi
+            rm -rf run/mods
+            echo "Cleaned up run/mods directory."
+          fi
+          if [ -d "build/libs" ]; then
+            if [ "${{ vars.DEBUG_MODE }}" = "true" ]; then
+              mkdir -p debug-archive/forge
+              cp -r build/libs debug-archive/forge/ || true
+              echo "Archived build/libs to debug-archive/forge/"
+            fi
+            rm -rf build/libs
+            echo "Cleaned up build/libs directory."
+          fi
+        shell: bash
+      - name: Upload Forge Debug Archive
+        if: vars.DEBUG_MODE == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: forge-debug-archive
+          path: debug-archive/forge/
+          retention-days: 3
       - name: Prepare Forge Test Environment
         id: prepare
         uses: ./.github/actions/prepare-test-env
