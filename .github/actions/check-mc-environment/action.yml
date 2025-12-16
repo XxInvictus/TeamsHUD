@@ -1,0 +1,94 @@
+name: 'Check Minecraft Environment'
+description: 'Diagnostic checks for Minecraft test environment including versions, mods, and HeadlessMC installation'
+
+inputs:
+  modloader:
+    description: 'Modloader type to check for (fabric, forge, neoforge, etc.)'
+    required: true
+  modloader-regex:
+    description: 'Regex pattern to match modloader version directories'
+    required: false
+    default: ''
+  check-refmap:
+    description: 'Check for refmap in mod jar files'
+    required: false
+    default: 'false'
+  mod-pattern:
+    description: 'Pattern to match mod jar files in run/mods'
+    required: false
+    default: '*.jar'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run Environment Checks
+      shell: bash
+      run: |
+        set +e
+        echo "=== Environment Analysis ==="
+        echo ""
+        echo "Working directory:"
+        pwd
+        echo ""
+        echo "build/libs directory contents:"
+        ls -la build/libs/ 2>/dev/null || echo "build/libs not found"
+        echo ""
+        echo "run/mods directory contents:"
+        ls -la run/mods/ 2>/dev/null || echo "run/mods not found"
+        
+        # Check for mod jar with pattern
+        if ! ls run/mods/${{ inputs.mod-pattern }} >/dev/null 2>&1; then
+          echo "⚠ WARNING: Mod jar not found in run/mods (pattern: ${{ inputs.mod-pattern }})"
+        else
+          echo "✓ Mod jar found in run/mods"
+          
+          # Check refmap if requested
+          if [ "${{ inputs.check-refmap }}" = "true" ]; then
+            echo ""
+            echo "Checking for refmap in release jar:"
+            if jar tf run/mods/${{ inputs.mod-pattern }} 2>/dev/null | grep -i refmap; then
+              echo "✓ Refmap found in release jar"
+            else
+              echo "⚠ WARNING: Refmap missing from release jar"
+            fi
+          fi
+        fi
+        
+        echo ""
+        echo "=== Checking all possible .minecraft locations ==="
+        for minecraft_dir in /home/runner/.minecraft /home/github-runner/.minecraft $HOME/.minecraft; do
+          if [ -d "$minecraft_dir" ]; then
+            echo ""
+            echo "Found .minecraft at: $minecraft_dir"
+            echo "Versions installed:"
+            ls -la "$minecraft_dir/versions/" 2>/dev/null || echo "  No versions directory"
+            if [ -d "$minecraft_dir/versions/" ]; then
+              # Determine regex pattern
+              REGEX_PATTERN="${{ inputs.modloader-regex }}"
+              if [ -z "$REGEX_PATTERN" ]; then
+                REGEX_PATTERN=".*${{ inputs.modloader }}.*"
+              fi
+              
+              for version_dir in "$minecraft_dir/versions"/*; do
+                if [ -d "$version_dir" ]; then
+                  version_name=$(basename "$version_dir")
+                  echo "  - $version_name"
+                  if [[ "$version_name" =~ $REGEX_PATTERN ]]; then
+                    echo "    ✓ MATCHES $REGEX_PATTERN regex"
+                  else
+                    echo "    ✗ Does NOT match $REGEX_PATTERN regex"
+                  fi
+                fi
+              done
+            fi
+          fi
+        done
+        
+        echo ""
+        echo "=== HeadlessMC installation check ==="
+        if command -v headlessmc &> /dev/null; then
+          echo "HeadlessMC found at: $(which headlessmc)"
+          headlessmc --version 2>/dev/null || echo "Could not get version"
+        else
+          echo "HeadlessMC not found in PATH"
+        fi

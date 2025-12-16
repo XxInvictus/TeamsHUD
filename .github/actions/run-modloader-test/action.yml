@@ -1,0 +1,247 @@
+name: 'Run Modloader Test'
+description: 'Comprehensive test runner for Minecraft modloaders (Fabric, Forge, NeoForge, etc.)'
+
+inputs:
+  modloader:
+    description: 'Modloader type (fabric, forge, neoforge, etc.)'
+    required: true
+  minecraft-version:
+    description: 'Minecraft version to test'
+    required: true
+  property-preset:
+    description: 'Property preset for prepare-test-env (e.g., fabric-test, forge-test)'
+    required: true
+  validation-flags:
+    description: 'Additional flags for validate-test-artifacts.sh (e.g., --check-refmap)'
+    required: false
+    default: ''
+  modloader-regex:
+    description: 'Regex pattern to match modloader version directories'
+    required: false
+    default: ''
+  test-regex:
+    description: 'Regex pattern for mc-runtime-test to match installed versions'
+    required: true
+  mc-runtime-test-type:
+    description: 'Type parameter for mc-runtime-test (fabric, lexforge, neoforge, etc.)'
+    required: true
+  dependencies-config:
+    description: 'JSON array of dependencies to download. Each dependency should have: name, source (modrinth/curseforge/url/github), project_id or url, version (optional), loaders (optional), game_versions (optional)'
+    required: false
+    default: '[]'
+  java-version:
+    description: 'Java version to use'
+    required: false
+    default: '17'
+  hmc-version:
+    description: 'HeadlessMC version'
+    required: false
+    default: '2.7.1'
+  headlessmc-command:
+    description: 'Additional HeadlessMC command parameters'
+    required: false
+    default: '-Dhmc.loglevel="DEBUG" --jvm "-Djava.awt.headless=true"'
+  needs-vanilla-cleanup:
+    description: 'Whether to clean vanilla version directory (workaround for mc-runtime-test bug)'
+    required: false
+    default: 'false'
+  download-dependencies:
+    description: 'Whether to download modloader-specific dependencies'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Fix Minecraft Path for Self-Hosted Runner
+      shell: bash
+      run: |
+        # mc-runtime-test hardcodes /home/runner for caching
+        # Create symlink for self-hosted runners that use different home paths
+        if [ ! -d "/home/runner" ] && [ -d "$HOME" ]; then
+          sudo mkdir -p /home/runner
+          sudo ln -sf "$HOME" /home/runner
+          echo "✓ Created symlink from $HOME to /home/runner"
+        fi
+    
+    - name: Prepare Test Environment
+      uses: ./.github/actions/prepare-test-env
+      id: prepare
+      with:
+        property-preset: ${{ inputs.property-preset }}
+    
+    - name: Download Modloader Dependencies
+      if: inputs.download-dependencies == 'true'
+      shell: bash
+      run: |
+        set -euo pipefail
+        mkdir -p run/mods
+        
+        # Ensure jq is available on the runner
+        if ! command -v jq >/dev/null 2>&1; then
+          sudo apt-get update -qq && sudo apt-get install -y -qq jq
+        fi
+        
+        minecraft_version="${{ steps.prepare.outputs.minecraft_version }}"
+        dependencies='${{ inputs.dependencies-config }}'
+        
+        # Check if dependencies config is empty
+        if [ "$dependencies" = "[]" ] || [ -z "$dependencies" ]; then
+          echo "No dependencies configured to download"
+          exit 0
+        fi
+        
+        echo "Processing $(echo "$dependencies" | jq 'length') dependencies..."
+        
+        # Parse and download each dependency
+        echo "$dependencies" | jq -c '.[]' | while read -r dep; do
+          name=$(echo "$dep" | jq -r '.name')
+          source=$(echo "$dep" | jq -r '.source')
+          
+          echo "\n=== Downloading $name ==="
+          
+          case "$source" in
+            modrinth)
+              project_id=$(echo "$dep" | jq -r '.project_id')
+              version=$(echo "$dep" | jq -r '.version // empty')
+              loaders=$(echo "$dep" | jq -r '.loaders // [] | map("%22" + . + "%22") | join(",")')
+              game_versions=$(echo "$dep" | jq -r '.game_versions // [] | map("%22" + . + "%22") | join(",")')
+              
+              # Build Modrinth API URL
+              api_url="https://api.modrinth.com/v2/project/${project_id}/version"
+              [ -n "$loaders" ] && api_url="${api_url}?loaders=%5B${loaders}%5D"
+              [ -n "$game_versions" ] && api_url="${api_url}&game_versions=%5B${game_versions}%5D"
+              
+              echo "Fetching version info from Modrinth API..."
+              response=$(curl -sS "$api_url") || { echo "Error: Failed to fetch from Modrinth API"; exit 1; }
+              
+              # Find matching version
+              if [ -n "$version" ]; then
+                file_url=$(echo "$response" | jq -r --arg ver "$version" '([(.[] | select(.version_number == $ver) | .files[0].url), (.[] | select(.version_number | startswith($ver)) | .files[0].url)] | map(select(.!=null)) | .[0])')
+              else
+                # Take latest version
+                file_url=$(echo "$response" | jq -r '.[0].files[0].url')
+              fi
+              
+              if [ -z "$file_url" ] || [ "$file_url" = "null" ]; then
+                echo "Error: Could not find $name version $version"
+                exit 1
+              fi
+              
+              echo "Downloading from ${file_url}"
+              curl -L -f -o "run/mods/${name}.jar" "${file_url}"
+              ;;
+            
+            curseforge)
+              project_id=$(echo "$dep" | jq -r '.project_id')
+              file_id=$(echo "$dep" | jq -r '.file_id // empty')
+              
+              if [ -n "$file_id" ]; then
+                # Direct file ID
+                file_url="https://www.curseforge.com/api/v1/mods/${project_id}/files/${file_id}/download"
+              else
+                echo "Error: CurseForge source requires file_id"
+                exit 1
+              fi
+              
+              echo "Downloading from CurseForge..."
+              curl -L -f -o "run/mods/${name}.jar" "${file_url}"
+              ;;
+            
+            url)
+              direct_url=$(echo "$dep" | jq -r '.url')
+              
+              if [ -z "$direct_url" ] || [ "$direct_url" = "null" ]; then
+                echo "Error: Direct URL source requires 'url' field"
+                exit 1
+              fi
+              
+              echo "Downloading from ${direct_url}"
+              curl -L -f -o "run/mods/${name}.jar" "${direct_url}"
+              ;;
+            
+            github)
+              repo=$(echo "$dep" | jq -r '.repo')
+              tag=$(echo "$dep" | jq -r '.tag // "latest"')
+              asset_pattern=$(echo "$dep" | jq -r '.asset_pattern // ".*\\.jar$"')
+              
+              if [ -z "$repo" ] || [ "$repo" = "null" ]; then
+                echo "Error: GitHub source requires 'repo' field (format: owner/repo)"
+                exit 1
+              fi
+              
+              # Get release info
+              if [ "$tag" = "latest" ]; then
+                api_url="https://api.github.com/repos/${repo}/releases/latest"
+              else
+                api_url="https://api.github.com/repos/${repo}/releases/tags/${tag}"
+              fi
+              
+              echo "Fetching release info from GitHub..."
+              release_data=$(curl -sS "$api_url") || { echo "Error: Failed to fetch from GitHub API"; exit 1; }
+              
+              # Find matching asset
+              asset_url=$(echo "$release_data" | jq -r --arg pattern "$asset_pattern" '.assets[] | select(.name | test($pattern)) | .browser_download_url' | head -n1)
+              
+              if [ -z "$asset_url" ]; then
+                echo "Error: Could not find matching asset for pattern: $asset_pattern"
+                exit 1
+              fi
+              
+              echo "Downloading from ${asset_url}"
+              curl -L -f -o "run/mods/${name}.jar" "${asset_url}"
+              ;;
+            
+            *)
+              echo "Error: Unknown dependency source: $source"
+              exit 1
+              ;;
+          esac
+          
+          echo "✓ Successfully downloaded $name"
+        done
+        
+        echo "\n✓ All dependencies downloaded successfully"
+    
+    - name: Validate Test Artifacts
+      shell: bash
+      run: bash .github/scripts/validate-test-artifacts.sh --modloader ${{ inputs.modloader }} ${{ inputs.validation-flags }}
+    
+    - name: Pre-Flight Environment Check
+      if: vars.DEBUG_MODE == 'true'
+      uses: ./.github/actions/check-mc-environment
+      with:
+        modloader: ${{ inputs.modloader }}
+        modloader-regex: ${{ inputs.modloader-regex || format('.*{0}.*', inputs.modloader) }}
+        check-refmap: ${{ contains(inputs.validation-flags, '--check-refmap') && 'true' || 'false' }}
+        mod-pattern: ${{ format('*-{0}-*.jar', inputs.modloader) }}
+    
+    - name: Clean Vanilla Minecraft Version
+      if: inputs.needs-vanilla-cleanup == 'true'
+      shell: bash
+      run: |
+        # Remove vanilla version to force mc-runtime-test to reinstall and install modloader
+        # This is necessary because the action checks for vanilla version, not modloader version
+        set +e
+        rm -rf $HOME/.minecraft/versions/${{ inputs.minecraft-version }}
+        echo "✓ Cleaned vanilla version directory for ${{ inputs.minecraft-version }}"
+    
+    - name: Run Modloader Test
+      uses: headlesshq/mc-runtime-test@4.1.0
+      with:
+        java: ${{ inputs.java-version }}
+        mc: ${{ inputs.minecraft-version }}
+        modloader: ${{ inputs.modloader }}
+        regex: ${{ inputs.test-regex }}
+        mc-runtime-test: ${{ inputs.mc-runtime-test-type }}
+        headlessmc-command: ${{ inputs.headlessmc-command }}
+        hmc-version: ${{ inputs.hmc-version }}
+    
+    - name: Post-Failure Environment Check
+      if: failure() && vars.DEBUG_MODE == 'true'
+      uses: ./.github/actions/check-mc-environment
+      with:
+        modloader: ${{ inputs.modloader }}
+        modloader-regex: ${{ inputs.modloader-regex || format('.*{0}.*', inputs.modloader) }}
+        check-refmap: 'false'
+        mod-pattern: ${{ format('*-{0}-*.jar', inputs.modloader) }}
