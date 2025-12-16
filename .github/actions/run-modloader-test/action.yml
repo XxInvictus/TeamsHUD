@@ -49,6 +49,10 @@ inputs:
     description: 'Whether to download modloader-specific dependencies'
     required: false
     default: 'false'
+  debug-mode:
+    description: 'Enable debug output (pre-flight and post-failure checks)'
+    required: false
+    default: 'false'
 
 runs:
   using: 'composite'
@@ -208,7 +212,7 @@ runs:
       run: bash .github/scripts/validate-test-artifacts.sh --modloader ${{ inputs.modloader }} ${{ inputs.validation-flags }}
     
     - name: Pre-Flight Environment Check
-      if: vars.DEBUG_MODE == 'true'
+      if: inputs.debug-mode == 'true'
       uses: ./.github/actions/check-mc-environment
       with:
         modloader: ${{ inputs.modloader }}
@@ -238,7 +242,7 @@ runs:
         hmc-version: ${{ inputs.hmc-version }}
     
     - name: Post-Failure Environment Check
-      if: failure() && vars.DEBUG_MODE == 'true'
+      if: failure() && inputs.debug-mode == 'true'
       uses: ./.github/actions/check-mc-environment
       with:
         modloader: ${{ inputs.modloader }}

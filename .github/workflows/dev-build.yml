@@ -59,6 +59,7 @@ jobs:
       mod_version: ${{ steps.properties.outputs.mod_version }}
       mod_name: ${{ steps.properties.outputs.mod_name }}
       mod_id: ${{ steps.properties.outputs.mod_id }}
+      fabric_version: ${{ steps.properties.outputs.fabric_version }}
       fabric_loader_version: ${{ steps.properties.outputs.fabric_loader_version }}
       forge_version: ${{ steps.properties.outputs.forge_version }}
       fabric_matrix: ${{ steps.test_matrix.outputs.fabric }}
@@ -182,7 +183,7 @@ jobs:
                 "name": "fabric-api",
                 "source": "modrinth",
                 "project_id": "P7dR8mSH",
-                "version": "${{ needs.build.outputs.fabric_loader_version }}",
+                "version": "${{ needs.build.outputs.fabric_version }}",
                 "loaders": ["fabric"],
                 "game_versions": ["${{ needs.build.outputs.minecraft_version }}"]
               },
@@ -197,6 +198,7 @@ jobs:
             ]
           download-dependencies: 'true'
           needs-vanilla-cleanup: 'false'
+          debug-mode: ${{ vars.DEBUG_MODE }}
 
   test-forge:
     name: Test Forge (${{ matrix.target }})
@@ -224,11 +226,12 @@ jobs:
           dependencies-config: '[]'
           needs-vanilla-cleanup: 'true'
           download-dependencies: 'false'
+          debug-mode: ${{ vars.DEBUG_MODE }}
 
   cleanup:
     name: Cleanup Artifacts
     needs: [build, test-fabric, test-forge]
-    if: always() && vars.DEBUG_MODE == 'false'
+    if: always() && vars.DEBUG_MODE != 'true'
     runs-on: HomeServ
     
     steps:
