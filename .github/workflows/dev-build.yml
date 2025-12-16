@@ -391,7 +391,9 @@ jobs:
 
       - name: Clean Minecraft versions for Forge test
         run: |
-          grep -P "^(?=.*\b${${{ steps.prepare.outputs.minecraft_version }}//\./\\.}b)(?=.*\bforge\b).*$"
+          set +e
+          grep -P "^(?=.*\b${steps.prepare.outputs.minecraft_version}//\./\\.}b)(?=.*\bforge\b).*$"
+          grep -P "^(?=.*\b${minecraft_version}//\./\\.}b)(?=.*\bforge\b).*$"
           rm -rf $HOME/.minecraft/versions/1.20.1
           ls -la $HOME/.minecraft/versions/
         shell: bash
