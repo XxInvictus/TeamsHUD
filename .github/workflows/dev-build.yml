@@ -398,6 +398,7 @@ jobs:
           modloader: forge
           regex: '.*forge.*'
           mc-runtime-test: lexforge
+          cache-mc: 'false'
           headlessmc-command: -Dhmc.loglevel="DEBUG" --jvm "-Djava.awt.headless=true"
 
       - name: Post-Failure Forge Environment Check
