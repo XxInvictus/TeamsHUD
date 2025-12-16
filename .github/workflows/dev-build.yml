@@ -194,8 +194,24 @@ jobs:
           fi
           
           minecraft_version="${{ steps.prepare.outputs.minecraft_version }}"
+          fabric_version="${{ steps.prepare.outputs.fabric_version }}"
           cloth_config_version="${{ steps.prepare.outputs.cloth_config_version }}"
           
+          # Download Fabric API
+          echo "Fetching Fabric API version info from Modrinth API..."
+          fabric_api_url="https://api.modrinth.com/v2/project/P7dR8mSH/version?loaders=%5B%22fabric%22%5D&game_versions=%5B%22${minecraft_version}%22%5D"
+          fabric_data=$(curl -sS "$fabric_api_url") || true
+          
+          fabric_file_url=$(printf '%s' "$fabric_data" | jq -r --arg ver "${fabric_version}" '([(.[] | select(.version_number == $ver) | .files[0].url), (.[] | select(.version_number | startswith($ver)) | .files[0].url)] | map(select(.!=null)) | .[0])')
+          
+          if [ -z "$fabric_file_url" ] || [ "$fabric_file_url" = "null" ]; then
+            echo "Error: Could not find Fabric API version ${fabric_version} for Minecraft ${minecraft_version}"
+            exit 1
+          fi
+          
+          echo "Downloading Fabric API from ${fabric_file_url}"
+          curl -L -f -o "run/mods/fabric-api.jar" "${fabric_file_url}"
+
           # Download Cloth Config
           echo "Fetching Cloth Config version info from Modrinth API..."
           cloth_api_url="https://api.modrinth.com/v2/project/9s6osm5g/version?loaders=%5B%22fabric%22%5D&game_versions=%5B%22${minecraft_version}%22%5D"
@@ -231,7 +247,7 @@ jobs:
           modloader: fabric
           regex: '.*fabric.*'
           mc-runtime-test: fabric
-          fabric-api: ${{ steps.prepare.outputs.fabric_version }}
+          # fabric-api: ${{ steps.prepare.outputs.fabric_version }}
           hmc-version: '2.7.1'
 
   test-forge:
