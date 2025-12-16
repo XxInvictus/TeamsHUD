@@ -335,19 +335,49 @@ jobs:
       - name: Pre-Forge In-Flight Checks
         if: vars.DEBUG_MODE == 'true'
         run: |
-          set -euo pipefail
-          echo "Output working directory:"
+          set +e
+          echo "=== Pre-Flight Environment Analysis ==="
+          echo ""
+          echo "Working directory:"
           pwd
-          echo "Listing build/libs contents:"
-          ls -la build/libs/
-          echo "Listing current directory contents:"
-          ls -la .
-          echo "Listing run/mods contents:"
-          ls -la run/mods/
-          echo "Verifying Forge jar presence:"
+          echo ""
+          echo "run/mods directory contents:"
+          ls -la run/mods/ 2>/dev/null || echo "run/mods not found"
           if ! ls run/mods/*-forge-*.jar >/dev/null 2>&1; then
-            echo "Error: Forge jar not found in run/mods"
-            exit 1
+            echo "⚠ WARNING: Forge jar not found in run/mods"
+          else
+            echo "✓ Forge jar found in run/mods"
+          fi
+          echo ""
+          echo "=== Checking all possible .minecraft locations ==="
+          for minecraft_dir in /home/runner/.minecraft /home/github-runner/.minecraft $HOME/.minecraft; do
+            if [ -d "$minecraft_dir" ]; then
+              echo ""
+              echo "Found .minecraft at: $minecraft_dir"
+              echo "Versions installed:"
+              ls -la "$minecraft_dir/versions/" 2>/dev/null || echo "  No versions directory"
+              if [ -d "$minecraft_dir/versions/" ]; then
+                for version_dir in "$minecraft_dir/versions"/*; do
+                  if [ -d "$version_dir" ]; then
+                    version_name=$(basename "$version_dir")
+                    echo "  - $version_name"
+                    if [[ "$version_name" =~ .*forge.* ]]; then
+                      echo "    ✓ MATCHES .*forge.* regex"
+                    else
+                      echo "    ✗ Does NOT match .*forge.* regex"
+                    fi
+                  fi
+                done
+              fi
+            fi
+          done
+          echo ""
+          echo "=== HeadlessMC installation check ==="
+          if command -v headlessmc &> /dev/null; then
+            echo "HeadlessMC found at: $(which headlessmc)"
+            headlessmc --version 2>/dev/null || echo "Could not get version"
+          else
+            echo "HeadlessMC not found in PATH"
           fi
       
       - name: Fix Minecraft Path for Self-Hosted Runner
@@ -368,12 +398,54 @@ jobs:
           modloader: forge
           regex: '.*forge.*'
           mc-runtime-test: lexforge
-          headlessmc-command: -Dhmc.loglevel="DEBUG"
-      
+          headlessmc-command: -Dhmc.loglevel="DEBUG" --jvm "-Djava.awt.headless=true"
+
+      - name: Post-Failure Forge Environment Check
+        if: failure() && vars.DEBUG_MODE == 'true'
+        run: |
+          set +e
+          echo "=== Post-Failure Environment Analysis ==="
+          echo ""
+          echo "Working directory:"
+          pwd
+          echo ""
+          echo "run/mods directory contents:"
+          ls -la run/mods/ 2>/dev/null || echo "run/mods not found"
+          echo ""
+          echo "=== Checking all possible .minecraft locations ==="
+          for minecraft_dir in /home/runner/.minecraft /home/github-runner/.minecraft $HOME/.minecraft; do
+            if [ -d "$minecraft_dir" ]; then
+              echo ""
+              echo "Found .minecraft at: $minecraft_dir"
+              echo "Versions installed:"
+              ls -la "$minecraft_dir/versions/" 2>/dev/null || echo "  No versions directory"
+              if [ -d "$minecraft_dir/versions/" ]; then
+                for version_dir in "$minecraft_dir/versions"/*; do
+                  if [ -d "$version_dir" ]; then
+                    version_name=$(basename "$version_dir")
+                    echo "  - $version_name"
+                    if [[ "$version_name" =~ .*forge.* ]]; then
+                      echo "    ✓ MATCHES .*forge.* regex"
+                    else
+                      echo "    ✗ Does NOT match .*forge.* regex"
+                    fi
+                  fi
+                done
+              fi
+            fi
+          done
+          echo ""
+          echo "=== HeadlessMC installation check ==="
+          if command -v headlessmc &> /dev/null; then
+            echo "HeadlessMC found at: $(which headlessmc)"
+            headlessmc --version 2>/dev/null || echo "Could not get version"
+          else
+            echo "HeadlessMC not found in PATH"
+          fi
+
       - name: Run Forge ${{ matrix.target }} Test without XVFB
-        
         uses: headlesshq/mc-runtime-test@4.1.0
-        if: failure() &&steps.run_forge_test.outcome == 'failure'
+        if: failure() && steps.run_forge_test.outcome == 'failure' && vars.DEBUG_MODE == 'true'
         with:
           java: '17'
           mc: ${{ steps.prepare.outputs.minecraft_version }}
