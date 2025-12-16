@@ -388,6 +388,11 @@ jobs:
             echo "Created symlink from $HOME to /home/runner"
           fi
         shell: bash
+
+      - name: Clean Minecraft versions for Forge test
+        if: runner.name == 'HomeServ'
+        run: |
+          rm -rf $HOME/.minecraft/versions/1.20.1
       
       - name: Run Forge ${{ matrix.target }} Test
         uses: headlesshq/mc-runtime-test@4.1.0
@@ -457,6 +462,7 @@ jobs:
           headlessmc-command: -Dhmc.loglevel="DEBUG"
           xvfb: 'false'
           hmc-version: '2.7.1'
+          cache-mc: 'false'
 
   cleanup:
     name: Cleanup Artifacts
