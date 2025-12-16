@@ -349,20 +349,15 @@ jobs:
             echo "Error: Forge jar not found in run/mods"
             exit 1
           fi
-          echo ""
-          echo "=== Testing regex pattern 'TeamsHUDPlus-forge-.*\.jar' ==="
-          for file in run/mods/*.jar; do
-            if [[ "$file" =~ TeamsHUDPlus-forge-.*\.jar ]]; then
-              echo "MATCH: $file"
-            else
-              echo "NO MATCH: $file"
-            fi
-          done
-          echo ""
-          echo "=== Files matching glob pattern 'TeamsHUDPlus-forge-*.jar' ==="
-          ls run/mods/TeamsHUDPlus-forge-*.jar || echo "No files match TeamsHUDPlus-forge-*.jar"
-          # echo "Checking mixin JSON contents:"
-          # unzip -p run/mods/*-forge-*.jar teamshudplus.mixins.json | head -20 || echo "Could not extract mixin JSON"
+      
+      - name: Fix Minecraft Path for Self-Hosted Runner
+        run: |
+          if [ ! -d "/home/runner/.minecraft" ] && [ -d "$HOME/.minecraft" ]; then
+            sudo mkdir -p /home/runner
+            sudo ln -sf "$HOME/.minecraft" /home/runner/.minecraft
+            echo "Created symlink from $HOME/.minecraft to /home/runner/.minecraft"
+          fi
+        shell: bash
       
       - name: Run Forge ${{ matrix.target }} Test
         uses: headlesshq/mc-runtime-test@4.1.0
@@ -371,7 +366,7 @@ jobs:
           java: '17'
           mc: ${{ steps.prepare.outputs.minecraft_version }}
           modloader: forge
-          regex: '.*TeamsHUDPlus-forge-.*\.jar'
+          regex: '.*forge.*'
           mc-runtime-test: lexforge
           headlessmc-command: -Dhmc.loglevel="DEBUG"
       
@@ -383,7 +378,7 @@ jobs:
           java: '17'
           mc: ${{ steps.prepare.outputs.minecraft_version }}
           modloader: forge
-          regex: '.*TeamsHUDPlus-forge-.*\.jar'
+          regex: '.*forge.*'
           mc-runtime-test: lexforge
           headlessmc-command: -Dhmc.loglevel="DEBUG"
           xvfb: 'false'
