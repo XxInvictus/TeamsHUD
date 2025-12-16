@@ -124,6 +124,7 @@ jobs:
         env:
           GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: dev
       - name: Validate Forge Release Jar Remapping
+        if: vars.DEBUG_MODE == 'true'
         run: bash .github/scripts/forge-remap.sh --action validate
       
       - name: Prepare Artifacts for Upload
@@ -164,35 +165,18 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Cleanup Test Directories
+      
+      - name: Fix Minecraft Path for Self-Hosted Runner
         run: |
-          # Archive and remove all test artifacts (run/mods and build/libs), regardless of type
-          if [ -d "run/mods" ]; then
-            if [ "${{ vars.DEBUG_MODE }}" = "true" ]; then
-              mkdir -p debug-archive/fabric
-              cp -r run debug-archive/fabric/ || true
-              echo "Archived run/ directory to debug-archive/fabric/"
-            fi
-            rm -rf run/mods
-            echo "Cleaned up run/mods directory."
-          fi
-          if [ -d "build/libs" ]; then
-            if [ "${{ vars.DEBUG_MODE }}" = "true" ]; then
-              mkdir -p debug-archive/fabric
-              cp -r build/libs debug-archive/fabric/ || true
-              echo "Archived build/libs to debug-archive/fabric/"
-            fi
-            rm -rf build/libs
-            echo "Cleaned up build/libs directory."
+          # mc-runtime-test hardcodes /home/runner for caching
+          # Create symlink for self-hosted runners that use different home paths
+          if [ ! -d "/home/runner" ] && [ -d "$HOME" ]; then
+            sudo mkdir -p /home/runner
+            sudo ln -sf "$HOME" /home/runner
+            echo "Created symlink from $HOME to /home/runner"
           fi
         shell: bash
-      - name: Upload Fabric Debug Archive
-        if: vars.DEBUG_MODE == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: fabric-debug-archive
-          path: debug-archive/fabric/
-          retention-days: 3
+      
       - name: Prepare Fabric Test Environment
         id: prepare
         uses: ./.github/actions/prepare-test-env
@@ -210,23 +194,7 @@ jobs:
           fi
           
           minecraft_version="${{ steps.prepare.outputs.minecraft_version }}"
-          fabric_version="${{ steps.prepare.outputs.fabric_version }}"
           cloth_config_version="${{ steps.prepare.outputs.cloth_config_version }}"
-          
-          # Download Fabric API
-          echo "Fetching Fabric API version info from Modrinth API..."
-          fabric_api_url="https://api.modrinth.com/v2/project/P7dR8mSH/version?loaders=%5B%22fabric%22%5D&game_versions=%5B%22${minecraft_version}%22%5D"
-          fabric_data=$(curl -sS "$fabric_api_url") || true
-          
-          fabric_file_url=$(printf '%s' "$fabric_data" | jq -r --arg ver "${fabric_version}" '([(.[] | select(.version_number == $ver) | .files[0].url), (.[] | select(.version_number | startswith($ver)) | .files[0].url)] | map(select(.!=null)) | .[0])')
-          
-          if [ -z "$fabric_file_url" ] || [ "$fabric_file_url" = "null" ]; then
-            echo "Error: Could not find Fabric API version ${fabric_version} for Minecraft ${minecraft_version}"
-            exit 1
-          fi
-          
-          echo "Downloading Fabric API from ${fabric_file_url}"
-          curl -L -f -o "run/mods/fabric-api.jar" "${fabric_file_url}"
           
           # Download Cloth Config
           echo "Fetching Cloth Config version info from Modrinth API..."
@@ -263,6 +231,8 @@ jobs:
           modloader: fabric
           regex: '.*fabric.*'
           mc-runtime-test: fabric
+          fabric-api: ${{ steps.prepare.outputs.fabric_version }}
+          hmc-version: '2.7.1'
 
   test-forge:
     name: Test Forge (${{ matrix.target }})
@@ -276,35 +246,18 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Cleanup Test Directories
+      
+      - name: Fix Minecraft Path for Self-Hosted Runner
         run: |
-          # Archive and remove all test artifacts (run/mods and build/libs), regardless of type
-          if [ -d "run/mods" ]; then
-            if [ "${{ vars.DEBUG_MODE }}" = "true" ]; then
-              mkdir -p debug-archive/forge
-              cp -r run debug-archive/forge/ || true
-              echo "Archived run/ directory to debug-archive/forge/"
-            fi
-            rm -rf run/mods
-            echo "Cleaned up run/mods directory."
-          fi
-          if [ -d "build/libs" ]; then
-            if [ "${{ vars.DEBUG_MODE }}" = "true" ]; then
-              mkdir -p debug-archive/forge
-              cp -r build/libs debug-archive/forge/ || true
-              echo "Archived build/libs to debug-archive/forge/"
-            fi
-            rm -rf build/libs
-            echo "Cleaned up build/libs directory."
+          # mc-runtime-test hardcodes /home/runner for caching
+          # Create symlink for self-hosted runners that use different home paths
+          if [ ! -d "/home/runner" ] && [ -d "$HOME" ]; then
+            sudo mkdir -p /home/runner
+            sudo ln -sf "$HOME" /home/runner
+            echo "Created symlink from $HOME to /home/runner"
           fi
         shell: bash
-      - name: Upload Forge Debug Archive
-        if: vars.DEBUG_MODE == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: forge-debug-archive
-          path: debug-archive/forge/
-          retention-days: 3
+      
       - name: Prepare Forge Test Environment
         id: prepare
         uses: ./.github/actions/prepare-test-env
@@ -314,21 +267,11 @@ jobs:
       - name: Prepare Test Environment
         run: |
           set -euo pipefail
-          echo "Downloaded release artifacts:"
-          ls -la build/libs/ || true
           rm -rf run/mods
           mkdir -p run/mods
           find build/libs -name '*-forge-*.jar' ! -name '*-javadoc.jar' ! -name '*-sources.jar' ! -name '*-dev.jar' -exec cp {} run/mods/ \;
           if ! ls run/mods/*-forge-*.jar >/dev/null 2>&1; then
             echo "Error: Forge release jar not found in build/libs"
-            ls -la run/mods/
-            exit 1
-          fi
-          echo "Mods directory:"
-          ls -la run/mods/
-          echo "Checking for refmap in release jar:"
-          if ! jar tf run/mods/*-forge-*.jar | grep -i refmap; then
-            echo "Error: refmap missing from release jar"
             exit 1
           fi
 
@@ -341,12 +284,22 @@ jobs:
           echo "Working directory:"
           pwd
           echo ""
+          echo "build/libs directory contents:"
+          ls -la build/libs/ 2>/dev/null || echo "build/libs not found"
+          echo ""
           echo "run/mods directory contents:"
           ls -la run/mods/ 2>/dev/null || echo "run/mods not found"
           if ! ls run/mods/*-forge-*.jar >/dev/null 2>&1; then
             echo "⚠ WARNING: Forge jar not found in run/mods"
           else
             echo "✓ Forge jar found in run/mods"
+            echo ""
+            echo "Checking for refmap in release jar:"
+            if jar tf run/mods/*-forge-*.jar | grep -i refmap; then
+              echo "✓ Refmap found in release jar"
+            else
+              echo "⚠ WARNING: Refmap missing from release jar"
+            fi
           fi
           echo ""
           echo "=== Checking all possible .minecraft locations ==="
@@ -380,36 +333,23 @@ jobs:
             echo "HeadlessMC not found in PATH"
           fi
       
-      - name: Fix Minecraft Path for Self-Hosted Runner
-        run: |
-          if [ ! -d "/home/runner/.minecraft" ] && [ -d "$HOME/.minecraft" ]; then
-            sudo mkdir -p /home/runner
-            sudo ln -sf "$HOME" /home/runner
-            echo "Created symlink from $HOME to /home/runner"
-          fi
-        shell: bash
-
       - name: Clean Minecraft versions for Forge test
         run: |
+          # Remove vanilla version to force mc-runtime-test to reinstall and install Forge
+          # This is necessary because the action checks for vanilla version, not modloader version
           set +e
-          echo "Test 1"
-          MC_VERSION=${{ steps.prepare.outputs.minecraft_version }} ls -1 $HOME/.minecraft/versions/ 2>/dev/null | grep -P "^(?=.*\b${MC_VERSION//\./\\.}b)(?=.*\bforge\b).*$"
-          echo "Test 2"
-          ls -1 $HOME/.minecraft/versions/ 2>/dev/null | grep -P "^(?=.*\b${minecraft_version//\./\\.}b)(?=.*\bforge\b).*$"
-          rm -rf $HOME/.minecraft/versions/1.20.1
-          ls -la $HOME/.minecraft/versions/
+          rm -rf $HOME/.minecraft/versions/${{ steps.prepare.outputs.minecraft_version }}
+          echo "Cleaned vanilla version directory"
         shell: bash
       
       - name: Run Forge ${{ matrix.target }} Test
         uses: headlesshq/mc-runtime-test@4.1.0
-        id: run_forge_test
         with:
           java: '17'
           mc: ${{ steps.prepare.outputs.minecraft_version }}
           modloader: forge
           regex: '.*forge.*'
           mc-runtime-test: lexforge
-          cache-mc: 'false'
           headlessmc-command: -Dhmc.loglevel="DEBUG" --jvm "-Djava.awt.headless=true"
           hmc-version: '2.7.1'
 
@@ -455,20 +395,6 @@ jobs:
           else
             echo "HeadlessMC not found in PATH"
           fi
-
-      - name: Run Forge ${{ matrix.target }} Test without XVFB
-        uses: headlesshq/mc-runtime-test@4.1.0
-        if: failure() && steps.run_forge_test.outcome == 'failure' && vars.DEBUG_MODE == 'true'
-        with:
-          java: '17'
-          mc: ${{ steps.prepare.outputs.minecraft_version }}
-          modloader: forge
-          regex: '.*forge.*'
-          mc-runtime-test: lexforge
-          headlessmc-command: -Dhmc.loglevel="DEBUG"
-          xvfb: 'false'
-          hmc-version: '2.7.1'
-          cache-mc: 'false'
 
   cleanup:
     name: Cleanup Artifacts
