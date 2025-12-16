@@ -390,9 +390,10 @@ jobs:
         shell: bash
 
       - name: Clean Minecraft versions for Forge test
-        if: runner.name == 'HomeServ'
         run: |
           rm -rf $HOME/.minecraft/versions/1.20.1
+          ls -la $HOME/.minecraft/versions/
+        shell: bash
       
       - name: Run Forge ${{ matrix.target }} Test
         uses: headlesshq/mc-runtime-test@4.1.0
