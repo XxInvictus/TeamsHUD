@@ -400,6 +400,7 @@ jobs:
           mc-runtime-test: lexforge
           cache-mc: 'false'
           headlessmc-command: -Dhmc.loglevel="DEBUG" --jvm "-Djava.awt.headless=true"
+          hmc-version: '2.7.1'
 
       - name: Post-Failure Forge Environment Check
         if: failure() && vars.DEBUG_MODE == 'true'
@@ -455,6 +456,7 @@ jobs:
           mc-runtime-test: lexforge
           headlessmc-command: -Dhmc.loglevel="DEBUG"
           xvfb: 'false'
+          hmc-version: '2.7.1'
 
   cleanup:
     name: Cleanup Artifacts
