@@ -61,6 +61,7 @@ jobs:
       mod_id: ${{ steps.properties.outputs.mod_id }}
       fabric_version: ${{ steps.properties.outputs.fabric_version }}
       fabric_loader_version: ${{ steps.properties.outputs.fabric_loader_version }}
+      cloth_config_version: ${{ steps.properties.outputs.cloth_config_version }}
       forge_version: ${{ steps.properties.outputs.forge_version }}
       fabric_matrix: ${{ steps.test_matrix.outputs.fabric }}
       forge_matrix: ${{ steps.test_matrix.outputs.forge }}
@@ -191,7 +192,7 @@ jobs:
                 "name": "cloth-config",
                 "source": "modrinth",
                 "project_id": "9s6osm5g",
-                "version": "15.0.0",
+                "version": "${{ needs.build.outputs.cloth_config_version }}",
                 "loaders": ["fabric"],
                 "game_versions": ["${{ needs.build.outputs.minecraft_version }}"]
               }
