@@ -354,8 +354,8 @@ jobs:
         run: |
           if [ ! -d "/home/runner/.minecraft" ] && [ -d "$HOME/.minecraft" ]; then
             sudo mkdir -p /home/runner
-            sudo ln -sf "$HOME/.minecraft" /home/runner/.minecraft
-            echo "Created symlink from $HOME/.minecraft to /home/runner/.minecraft"
+            sudo ln -sf "$HOME" /home/runner
+            echo "Created symlink from $HOME to /home/runner"
           fi
         shell: bash
       
