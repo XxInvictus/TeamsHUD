@@ -74,12 +74,15 @@ runs:
       with:
         property-preset: ${{ inputs.property-preset }}
     
+    - name: Validate Test Artifacts
+      shell: bash
+      run: bash .github/scripts/validate-test-artifacts.sh --modloader ${{ inputs.modloader }} ${{ inputs.validation-flags }}
+    
     - name: Download Modloader Dependencies
       if: inputs.download-dependencies == 'true'
       shell: bash
       run: |
         set -euo pipefail
-        mkdir -p run/mods
         
         # Ensure jq is available on the runner
         if ! command -v jq >/dev/null 2>&1; then
@@ -206,10 +209,6 @@ runs:
         done
         
         echo "\n✓ All dependencies downloaded successfully"
-    
-    - name: Validate Test Artifacts
-      shell: bash
-      run: bash .github/scripts/validate-test-artifacts.sh --modloader ${{ inputs.modloader }} ${{ inputs.validation-flags }}
     
     - name: Pre-Flight Environment Check
       if: inputs.debug-mode == 'true'
