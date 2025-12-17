@@ -99,7 +99,7 @@ jobs:
       
       - name: Extract Build Properties
         id: properties
-        run: bash mc_dev_shared/mc_dev_shared/.github/scripts/extract-properties.sh --preset build
+        run: bash mc_dev_shared/.github/scripts/extract-properties.sh --preset build
       
       - name: Determine Test Targets
         id: test_matrix
