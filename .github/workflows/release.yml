@@ -91,7 +91,7 @@ jobs:
           repository: XxInvictus/mc_dev_shared
           path: mc_dev_shared
           ref: main
-          sparse-checkout: 'mc_dev_shared/.github/scripts/'
+          sparse-checkout: '.github/scripts/'
       
       - name: Check if Dry Run Mode
         id: check_dry_run
@@ -338,7 +338,7 @@ jobs:
           repository: XxInvictus/mc_dev_shared
           path: mc_dev_shared
           ref: main
-          sparse-checkout: 'mc_dev_shared/.github/scripts/'
+          sparse-checkout: '.github/scripts/'
 
       - name: Prepare Release Artifacts
         id: release_artifacts
@@ -406,7 +406,7 @@ jobs:
           repository: XxInvictus/mc_dev_shared
           path: mc_dev_shared
           ref: main
-          sparse-checkout: 'mc_dev_shared/.github/scripts/'
+          sparse-checkout: '.github/scripts/'
 
       - name: Prepare Publish Environment
         id: publish_artifacts

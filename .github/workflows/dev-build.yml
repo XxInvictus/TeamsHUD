@@ -76,7 +76,7 @@ jobs:
           repository: XxInvictus/mc_dev_shared
           path: mc_dev_shared
           ref: main
-          sparse-checkout: 'mc_dev_shared/.github/scripts/'
+          sparse-checkout: '.github/scripts/'
 
       
       - name: Setup Java 17
@@ -183,7 +183,7 @@ jobs:
           repository: XxInvictus/mc_dev_shared
           path: mc_dev_shared
           ref: main
-          sparse-checkout: 'mc_dev_shared/.github/scripts/'
+          sparse-checkout: '.github/scripts/'
       
       - name: Run Fabric Modloader Test
         uses: XxInvictus/mc_dev_shared/.github/actions/run-modloader-test@main
@@ -237,7 +237,7 @@ jobs:
           repository: XxInvictus/mc_dev_shared
           path: mc_dev_shared
           ref: main
-          sparse-checkout: 'mc_dev_shared/.github/scripts/'
+          sparse-checkout: '.github/scripts/'
       
       - name: Run Forge Modloader Test
         uses: XxInvictus/mc_dev_shared/.github/actions/run-modloader-test@main
