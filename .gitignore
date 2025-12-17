@@ -34,3 +34,4 @@ logs/
 eclipse
 run
 build_docs/
+external/

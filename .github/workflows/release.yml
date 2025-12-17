@@ -84,6 +84,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Checkout Shared Scripts
+        uses: actions/checkout@v4
+        with:
+          repository: XxInvictus/mc_dev_shared
+          path: mc_dev_shared
+          ref: main
+          sparse-checkout: 'mc_dev_shared/.github/scripts/'
       
       - name: Check if Dry Run Mode
         id: check_dry_run
@@ -152,7 +160,7 @@ jobs:
       
       - name: Extract Build Properties
         id: properties
-        run: bash .github/scripts/extract-properties.sh --preset release
+        run: bash mc_dev_shared/mc_dev_shared/.github/scripts/extract-properties.sh --preset release
       
       - name: Check for Version Conflicts
         id: version_check
@@ -178,14 +186,14 @@ jobs:
           GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: release
       - name: Check Forge Remap Status
         id: forge_remap_check
-        run: bash .github/scripts/forge-remap.sh --action check
+        run: bash mc_dev_shared/.github/scripts/forge-remap.sh --action check
       - name: Sync Forge Release Jar
         if: steps.forge_remap_check.outputs.needs_sync == 'true'
         run: ./gradlew :forge:syncReobfReleaseJar --no-daemon --build-cache --rerun-tasks
         env:
           GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: release
       - name: Validate Forge Release Jar Remapping
-        run: bash .github/scripts/forge-remap.sh --action validate
+        run: bash mc_dev_shared/.github/scripts/forge-remap.sh --action validate
       
       - name: Set Custom Changelog
         id: custom_changelog_check
@@ -324,9 +332,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Checkout Shared Scripts
+        uses: actions/checkout@v4
+        with:
+          repository: XxInvictus/mc_dev_shared
+          path: mc_dev_shared
+          ref: main
+          sparse-checkout: 'mc_dev_shared/.github/scripts/'
+
       - name: Prepare Release Artifacts
         id: release_artifacts
-        uses: ./.github/actions/prepare-artifacts
+        uses: XxInvictus/mc_dev_shared/.github/actions/prepare-artifacts@main
         with:
           cache-path: build/libs
           cache-key: release-build-${{ needs.build.outputs.full_version }}-
@@ -384,9 +400,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Checkout Shared Scripts
+        uses: actions/checkout@v4
+        with:
+          repository: XxInvictus/mc_dev_shared
+          path: mc_dev_shared
+          ref: main
+          sparse-checkout: 'mc_dev_shared/.github/scripts/'
+
       - name: Prepare Publish Environment
         id: publish_artifacts
-        uses: ./.github/actions/prepare-artifacts
+        uses: XxInvictus/mc_dev_shared/.github/actions/prepare-artifacts@main
         with:
           cache-path: |
             fabric/build/libs/*-fabric-*.jar
@@ -454,7 +478,7 @@ jobs:
   cleanup:
     name: Cleanup Artifacts
     needs: [build, release, publish]
-    if: always() && (needs.publish.result == 'success' || needs.publish.result == 'failure') && vars.DEBUG_MODE == 'false'
+    if: always() && vars.DEBUG_MODE == 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     
