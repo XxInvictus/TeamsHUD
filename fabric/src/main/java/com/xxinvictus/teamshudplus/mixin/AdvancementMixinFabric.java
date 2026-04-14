@@ -1,6 +1,6 @@
 package com.xxinvictus.teamshudplus.mixin;
 
-import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.level.ServerPlayer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,8 +27,8 @@ public class AdvancementMixinFabric {
      * @param criterionName The criterion that was completed
      * @param ci Callback info returnable
      */
-    @Inject(method = "award", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerAdvancements;markForVisibilityUpdate(Lnet/minecraft/advancements/Advancement;)V"))
-    public void advancementCompleted(Advancement advancement, String criterionName, CallbackInfoReturnable<Boolean> ci) {
+    @Inject(method = "award", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerAdvancements;markForVisibilityUpdate(Lnet/minecraft/advancements/AdvancementHolder;)V"))
+    public void advancementCompleted(AdvancementHolder advancement, String criterionName, CallbackInfoReturnable<Boolean> ci) {
             TeamsHUDPlus.onAdvancement(player, advancement);
     }
 }

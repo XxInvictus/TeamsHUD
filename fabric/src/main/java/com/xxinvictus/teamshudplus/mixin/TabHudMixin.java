@@ -12,6 +12,11 @@ import com.xxinvictus.teamshudplus.client.TeamsHUDPlusClient;
 
 /**
  * Mixin for PlayerTabOverlay to adjust tab list positioning when compass HUD is showing.
+ *
+ * WARNING: This mixin is extremely fragile. The @ModifyVariable ordinal = 9 targets the
+ * 10th local variable stored in PlayerTabOverlay.render(), which depends on the exact
+ * bytecode layout. This ordinal needs verification against the 26.1.2 bytecode; if the
+ * render method's local variable count or order changed, the ordinal must be updated.
  */
 @Mixin(PlayerTabOverlay.class)
 public class TabHudMixin {

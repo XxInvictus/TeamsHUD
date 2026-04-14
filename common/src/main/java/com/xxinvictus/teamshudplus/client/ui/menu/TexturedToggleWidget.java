@@ -2,101 +2,94 @@ package com.xxinvictus.teamshudplus.client.ui.menu;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Supplier;
 
 /**
- * An image button that toggles between two texture states based on a boolean supplier.
+ * A button that toggles between two texture states based on a boolean supplier.
  */
-public class TexturedToggleWidget extends ImageButton {
+public class TexturedToggleWidget extends Button {
 
-
+    private final int xTexStart;
+    private final int yTexStart;
+    private final int yDiffTex;
+    private final ResourceLocation resourceLocation;
+    private final int textureWidth;
+    private final int textureHeight;
     private final Supplier<Boolean> booleanSupplier;
 
     /**
      * Creates a textured toggle widget.
-     * @param pX X position
-     * @param pY Y position
-     * @param pWidth Width
-     * @param pHeight Height
+     * @param x X position
+     * @param y Y position
+     * @param width Width
+     * @param height Height
      * @param u Texture U coordinate
      * @param v Texture V coordinate
-     * @param pResourceLocation Texture resource
-     * @param pOnPress Press handler
+     * @param texture Texture resource
+     * @param onPress Press handler
      * @param booleanSupplier Supplier for toggle state
      */
-    public TexturedToggleWidget(int pX, int pY, int pWidth, int pHeight, int u, int v, ResourceLocation pResourceLocation, Button.OnPress pOnPress, Supplier<Boolean> booleanSupplier) {
-        this(pX, pY, pWidth, pHeight, u, v, pHeight, pResourceLocation, 256, 256, pOnPress,booleanSupplier);
+    public TexturedToggleWidget(int x, int y, int width, int height, int u, int v, ResourceLocation texture, Button.OnPress onPress, Supplier<Boolean> booleanSupplier) {
+        this(x, y, width, height, u, v, height, texture, 256, 256, onPress, booleanSupplier);
     }
 
     /**
      * Creates a textured toggle widget with texture difference.
-     * @param pX X position
-     * @param pY Y position
-     * @param pWidth Width
-     * @param pHeight Height
-     * @param pXTexStart Texture X start
-     * @param pYTexStart Texture Y start
-     * @param pYDiffTex Texture Y difference
-     * @param pResourceLocation Texture resource
-     * @param pOnPress Press handler
+     * @param x X position
+     * @param y Y position
+     * @param width Width
+     * @param height Height
+     * @param xTexStart Texture X start
+     * @param yTexStart Texture Y start
+     * @param yDiffTex Texture Y difference
+     * @param texture Texture resource
+     * @param onPress Press handler
      * @param supplier Toggle state supplier
      */
-    public TexturedToggleWidget(int pX, int pY, int pWidth, int pHeight, int pXTexStart, int pYTexStart, int pYDiffTex, ResourceLocation pResourceLocation, Button.OnPress pOnPress,Supplier<Boolean> supplier) {
-        this(pX, pY, pWidth, pHeight, pXTexStart, pYTexStart, pYDiffTex, pResourceLocation, 256, 256, pOnPress,supplier);
+    public TexturedToggleWidget(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, ResourceLocation texture, Button.OnPress onPress, Supplier<Boolean> supplier) {
+        this(x, y, width, height, xTexStart, yTexStart, yDiffTex, texture, 256, 256, onPress, supplier);
     }
 
     /**
      * Creates a textured toggle widget with custom texture dimensions.
-     * @param pX X position
-     * @param pY Y position
-     * @param pWidth Width
-     * @param pHeight Height
-     * @param pXTexStart Texture X start
-     * @param pYTexStart Texture Y start
-     * @param pYDiffTex Texture Y difference
-     * @param pResourceLocation Texture resource
-     * @param pTextureWidth Texture width
-     * @param pTextureHeight Texture height
-     * @param pOnPress Press handler
+     * @param x X position
+     * @param y Y position
+     * @param width Width
+     * @param height Height
+     * @param xTexStart Texture X start
+     * @param yTexStart Texture Y start
+     * @param yDiffTex Texture Y difference
+     * @param texture Texture resource
+     * @param textureWidth Texture width
+     * @param textureHeight Texture height
+     * @param onPress Press handler
      * @param supplier Toggle state supplier
      */
-    public TexturedToggleWidget(int pX, int pY, int pWidth, int pHeight, int pXTexStart, int pYTexStart, int pYDiffTex, ResourceLocation pResourceLocation, int pTextureWidth, int pTextureHeight, Button.OnPress pOnPress,Supplier<Boolean> supplier) {
-        this(pX, pY, pWidth, pHeight, pXTexStart, pYTexStart, pYDiffTex, pResourceLocation, pTextureWidth, pTextureHeight, pOnPress, CommonComponents.EMPTY,supplier);
-    }
-
-    /**
-     * Creates a textured toggle widget with all parameters.
-     * @param pX X position
-     * @param pY Y position
-     * @param pWidth Width
-     * @param pHeight Height
-     * @param pXTexStart Texture X start
-     * @param pYTexStart Texture Y start
-     * @param pYDiffTex Texture Y difference
-     * @param pResourceLocation Texture resource
-     * @param pTextureWidth Texture width
-     * @param pTextureHeight Texture height
-     * @param pOnPress Press handler
-     * @param pMessage Button message
-     * @param supplier Toggle state supplier
-     */
-    public TexturedToggleWidget(int pX, int pY, int pWidth, int pHeight, int pXTexStart, int pYTexStart, int pYDiffTex, ResourceLocation pResourceLocation, int pTextureWidth, int pTextureHeight, Button.OnPress pOnPress, Component pMessage,Supplier<Boolean> supplier) {
-        super(pX, pY, pWidth, pHeight, pXTexStart, pYTexStart, pYDiffTex, pResourceLocation, pTextureWidth, pTextureHeight, pOnPress, pMessage);
+    public TexturedToggleWidget(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, ResourceLocation texture, int textureWidth, int textureHeight, Button.OnPress onPress, Supplier<Boolean> supplier) {
+        super(x, y, width, height, Component.empty(), onPress, Button.DEFAULT_NARRATION);
+        this.xTexStart = xTexStart;
+        this.yTexStart = yTexStart;
+        this.yDiffTex = yDiffTex;
+        this.resourceLocation = texture;
+        this.textureWidth = textureWidth;
+        this.textureHeight = textureHeight;
         this.booleanSupplier = supplier;
     }
 
     @Override
-    public void renderWidget(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        int j = xTexStart;
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        int u = xTexStart;
         if (booleanSupplier.get()) {
-            j+=width;
+            u += width;
         }
-            this.renderTexture(pGuiGraphics, this.resourceLocation, this.getX(), this.getY(), this.xTexStart, this.yTexStart,
-                    this.yDiffTex, j, this.height, this.textureWidth, this.textureHeight);
+        int v = yTexStart;
+        if (this.isHoveredOrFocused()) {
+            v += yDiffTex;
+        }
+        graphics.blit(RenderType::guiTextured, this.resourceLocation, this.getX(), this.getY(), u, v, this.width, this.height, this.textureWidth, this.textureHeight);
     }
 }

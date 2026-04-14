@@ -11,7 +11,7 @@ import com.xxinvictus.teamshudplus.network.client.S2CTeamUpdatePacket;
 import com.xxinvictus.teamshudplus.platform.Services;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -46,7 +46,7 @@ public class ModTeam extends net.minecraft.world.scores.Team {
     private final TeamDB teamDB;
     private final Set<UUID> players;
     private final Map<UUID, ServerPlayer> onlinePlayers;
-    private final Set<Advancement> advancements = new LinkedHashSet<>();
+    private final Set<AdvancementHolder> advancements = new LinkedHashSet<>();
     private PlayerTeam scoreboardTeam;
 
     /**
@@ -147,7 +147,7 @@ public class ModTeam extends net.minecraft.world.scores.Team {
      * Adds a shared advancement to the team
      * @param advancement The advancement to add
      */
-    public void addAdvancement(Advancement advancement) {
+    public void addAdvancement(AdvancementHolder advancement) {
         advancements.add(advancement);
     }
 
@@ -155,7 +155,7 @@ public class ModTeam extends net.minecraft.world.scores.Team {
      * Gets all shared advancements for the team
      * @return Set of team advancements
      */
-    public Set<Advancement> getAdvancements() {
+    public Set<AdvancementHolder> getAdvancements() {
         return advancements;
     }
 
@@ -182,7 +182,7 @@ public class ModTeam extends net.minecraft.world.scores.Team {
         }
         // Advancement Sync
         if (Services.PLATFORM.getConfig().syncAdvancements()) {
-            for (Advancement advancement : getAdvancements()) {
+            for (AdvancementHolder advancement : getAdvancements()) {
                 AdvancementProgress progress = player.getAdvancements().getOrStartProgress(advancement);
                 for (String criterion : progress.getRemainingCriteria()) {
                     player.getAdvancements().award(advancement, criterion);
@@ -233,8 +233,8 @@ public class ModTeam extends net.minecraft.world.scores.Team {
             playerOnline(playerEntity, true);
             // Advancement Sync
             if (Services.PLATFORM.getConfig().syncAdvancements()) {
-                Set<Advancement> advancements = ((AdvancementAccessor) playerEntity.getAdvancements()).getVisibleAdvancements();
-                for (Advancement advancement : advancements) {
+                Set<AdvancementHolder> advancements = ((AdvancementAccessor) playerEntity.getAdvancements()).getVisibleAdvancements();
+                for (AdvancementHolder advancement : advancements) {
                     if (playerEntity.getAdvancements().getOrStartProgress(advancement).isDone()) {
                         addAdvancement(advancement);
                     }
@@ -343,7 +343,7 @@ public class ModTeam extends net.minecraft.world.scores.Team {
 
         ListTag advList = new ListTag();
         for (var advancement : advancements) {
-            advList.add(StringTag.valueOf(advancement.getId().toString()));
+            advList.add(StringTag.valueOf(advancement.id().toString()));
         }
         compound.put("advancements", advList);
 

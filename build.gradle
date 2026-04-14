@@ -1,14 +1,11 @@
 plugins {
-    id 'fabric-loom' version '1.7-SNAPSHOT' apply(false)
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)' apply(false)
-    id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT' apply(false)
-    id("org.spongepowered.mixin") version "0.7-SNAPSHOT" apply(false)
+    id 'net.fabricmc.fabric-loom' version "${loom_version}" apply(false)
 }
 
 subprojects {
     apply plugin: 'java'
 
-    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+    java.toolchain.languageVersion = JavaLanguageVersion.of(25)
     java.withSourcesJar()
     java.withJavadocJar()
 
@@ -44,42 +41,30 @@ subprojects {
             name = 'Sponge / Mixin'
             url = 'https://repo.spongepowered.org/repository/maven-public/'
         }
-        maven {
-            name = 'BlameJared Maven (JEI / CraftTweaker / Bookshelf)'
-            url = 'https://maven.blamejared.com'
-        }
         maven { url "https://maven.shedaniel.me/" }
-
     }
 
     tasks.withType(JavaCompile).configureEach {
-
         it.options.encoding = 'UTF-8'
-        it.options.getRelease().set(17)
+        it.options.release = 25
     }
 
     processResources {
-        int pack_format = getPackFormat()
         def expandProps = [
-                "mod_version"               : mod_version,
-                "mod_group_id"              : mod_group_id, //Else we target the task's group.
-                "minecraft_version"         : minecraft_version,
-                "minecraft_version_range"   : minecraft_version_range,
-                "forge_version"             : forge_version,
-                "forge_loader_version_range": forge_loader_version_range,
-                "forge_version_range"       : forge_version_range,
-                "fabric_version"            : fabric_version,
-                "fabric_loader_version"     : fabric_loader_version,
-                "mod_name"                  : mod_name,
-                "mod_authors"               : mod_authors,
-                "mod_id"                    : mod_id,
-                "mod_license"               : mod_license,
-                "mod_description"           : mod_description,
-                "issue_tracker_url"         : issue_tracker_url,
-                "pack_format"               : pack_format
+                "mod_version"             : mod_version,
+                "mod_group_id"            : mod_group_id,
+                "minecraft_version"       : minecraft_version,
+                "fabric_version"          : fabric_version,
+                "fabric_loader_version"   : fabric_loader_version,
+                "mod_name"                : mod_name,
+                "mod_authors"             : mod_authors,
+                "mod_id"                  : mod_id,
+                "mod_license"             : mod_license,
+                "mod_description"         : mod_description,
+                "issue_tracker_url"       : issue_tracker_url,
         ]
 
-        filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', '*.mixins.json']) {
+        filesMatching(['pack.mcmeta', 'fabric.mod.json', '*.mixins.json']) {
             expand expandProps
         }
         inputs.properties(expandProps)
@@ -90,19 +75,5 @@ subprojects {
     // other mod developers.
     tasks.withType(GenerateModuleMetadata).configureEach {
         enabled = false
-    }
-}
-
-int getPackFormat() {
-    switch (minecraft_version) {
-        case "1.18.2": return 8
-        case "1.19.2": return 9
-        case "1.19.3": return 12
-        case "1.19.4": return 13
-        case "1.20.1": return 15
-        case "1.20.2": return 18
-        case "1.20.3": return 22
-        case "1.20.4": return 22
-        default: return 6
     }
 }

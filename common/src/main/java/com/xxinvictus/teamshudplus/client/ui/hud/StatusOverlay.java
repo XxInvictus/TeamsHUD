@@ -9,6 +9,7 @@ import com.xxinvictus.teamshudplus.platform.Services;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -153,20 +154,20 @@ public class StatusOverlay {
 
         // Health
         String health = String.valueOf(Math.round(teammate.getHealth()));
-        graphics.blit(ICONS,posX + 20, posY, 0, 0, 9, 9);
+        graphics.blit(RenderType::guiTextured, ICONS, posX + 20, posY, 0, 0, 9, 9, 256, 256);
         graphics.drawString(client.font, ModComponents.literal(health), posX + 32, posY, ChatFormatting.WHITE.getColor());
 
         // Hunger
         if (Services.PLATFORM.getConfig().showHunger()) {
             String hunger = String.valueOf(teammate.getHunger());
-            graphics.blit(ICONS, posX + 46, posY, 9, 0, 9, 9);
+            graphics.blit(RenderType::guiTextured, ICONS, posX + 46, posY, 9, 0, 9, 9, 256, 256);
             graphics.drawString(client.font, ModComponents.literal(hunger), posX + 58, posY, ChatFormatting.WHITE.getColor());
         }
 
         // Draw skin (using relative positioning)
         graphics.pose().pushPose();
         graphics.pose().scale(0.5F, 0.5F, 0.5F);
-        graphics.blit(teammate.skin, 2 * (posX + 4), 2 * posY + 8, 32, 32, 32, 32);
+        graphics.blit(RenderType::guiTextured, teammate.skin, 2 * (posX + 4), 2 * posY + 8, 32, 32, 32, 32, 64, 64);
         graphics.pose().popPose();
 
         // Draw name with optional distance

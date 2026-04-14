@@ -6,6 +6,7 @@ import com.xxinvictus.teamshudplus.platform.Services;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
@@ -23,7 +24,7 @@ public class CompassOverlay {
     private static final float MAX_SCALE = 0.4f;
     private static final float MIN_ALPHA = 0.4f;
 
-    static final ResourceLocation GUI_ICONS_LOCATION = new ResourceLocation("textures/gui/icons.png");
+    static final ResourceLocation GUI_ICONS_LOCATION = ResourceLocation.withDefaultNamespace("textures/gui/icons.png");
 
     /** Whether the compass overlay is enabled */
     public boolean enabled = true;
@@ -143,7 +144,7 @@ public class CompassOverlay {
             float alpha = (1 - minScale) * (1 - MIN_ALPHA) + MIN_ALPHA;
             RenderSystem.enableBlend();
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
-            graphics.blit(GUI_ICONS_LOCATION, baseX, baseY, 0, 74, HUD_WIDTH, HUD_HEIGHT);
+            graphics.blit(RenderType::guiTextured, GUI_ICONS_LOCATION, baseX, baseY, 0, 74, HUD_WIDTH, HUD_HEIGHT, 256, 256);
             
             RenderSystem.disableBlend();
             isShowing = true;
@@ -226,9 +227,9 @@ public class CompassOverlay {
         graphics.pose().scale(sizeFactor, sizeFactor, sizeFactor);
         if (1 - Math.abs(renderFactor) < Math.min(alphaFactor, 0.6f)) {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, (float) (1 - Math.abs(renderFactor)));
-            graphics.blit(skin, Math.round(x / sizeFactor), Math.round(y / sizeFactor), 32, 32, 32, 32);
+            graphics.blit(RenderType::guiTextured, skin, Math.round(x / sizeFactor), Math.round(y / sizeFactor), 32, 32, 32, 32, 64, 64);
         } else {
-            graphics.blit(skin, Math.round(x / sizeFactor), Math.round(y / sizeFactor), 32, 32, 32, 32);
+            graphics.blit(RenderType::guiTextured, skin, Math.round(x / sizeFactor), Math.round(y / sizeFactor), 32, 32, 32, 32, 64, 64);
         }
         RenderSystem.disableBlend();
         graphics.pose().popPose();

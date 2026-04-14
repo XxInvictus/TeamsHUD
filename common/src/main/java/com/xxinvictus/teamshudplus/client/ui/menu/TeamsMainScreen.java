@@ -20,7 +20,7 @@ public class TeamsMainScreen extends TeamsScreen {
     static final int WIDTH = 256;
     /** Height of the screen */
     static final int HEIGHT = 166;
-    private static final ResourceLocation TEXTURE = new ResourceLocation(TeamsHUDPlus.MODID, "textures/gui/screen_background.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TeamsHUDPlus.MODID, "textures/gui/screen_background.png");
 
     /**
      * Creates a main team screen.

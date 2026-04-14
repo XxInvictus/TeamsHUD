@@ -2,26 +2,23 @@ plugins {
     id 'idea'
     id 'java'
     id 'maven-publish'
-    id 'org.spongepowered.gradle.vanilla'
+    id 'net.fabricmc.fabric-loom'
 }
 base {
     archivesName = "${mod_name}-common-${minecraft_version}"
 }
-minecraft {
-    version(minecraft_version)
-    if(file("src/main/resources/${mod_id}.accesswidener").exists()){
-        accessWideners(file("src/main/resources/${mod_id}.accesswidener"))
-    }
-}
 
 dependencies {
-     compileOnly group:'org.spongepowered', name:'mixin', version:'0.8.5'
-     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    compileOnly group:'org.spongepowered', name:'mixin', version:'0.8.7'
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
 }
 
-tasks.named("compileJava", JavaCompile).configure {
-    outputs.file(layout.buildDirectory.file("tmp/compileJava/${mod_id}.refmap.json"))
-    outputs.file(layout.buildDirectory.file("tmp/compileJava/compileJava-refmap.json"))
+loom {
+    if (project.file("src/main/resources/${mod_id}.accesswidener").exists()) {
+        accessWidenerPath.set(project.file("src/main/resources/${mod_id}.accesswidener"))
+    }
 }
 
 publishing {

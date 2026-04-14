@@ -19,7 +19,7 @@ public class TeamSuggestions {
     }
 
     /** Suggestion provider for team names in commands */
-    static final SuggestionProvider<CommandSourceStack> TEAMS = SuggestionProviders.register(new ResourceLocation("teams"), (context, builder) -> {
+    static final SuggestionProvider<CommandSourceStack> TEAMS = SuggestionProviders.register(ResourceLocation.withDefaultNamespace("teams"), (context, builder) -> {
         Stream<ModTeam> teams = TeamDB.getOrMakeDefault(((CommandSourceStack)context.getSource()).getServer()).getTeams();
         teams.forEach(team -> {
             builder.suggest(team.getName());

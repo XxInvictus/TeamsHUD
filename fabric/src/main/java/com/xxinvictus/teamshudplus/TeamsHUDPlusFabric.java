@@ -47,11 +47,11 @@ public class TeamsHUDPlusFabric implements ModInitializer {
 		CommandRegistrationCallback.EVENT.register((dispatcher,a,b) -> TeamCommand.register(dispatcher));
 		// Event hooks
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			ServerPlayer player = handler.player;
+			ServerPlayer player = handler.getPlayer();
 			TeamsHUDPlus.playerConnect(player);
 		});
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
-			ServerPlayer player = handler.player;
+			ServerPlayer player = handler.getPlayer();
 			TeamsHUDPlus.playerDisconnect(player);
 		});
 		ServerPlayerEvents.COPY_FROM.register(TeamsHUDPlus::playerClone);

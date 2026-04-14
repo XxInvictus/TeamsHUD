@@ -1,5 +1,6 @@
 package com.xxinvictus.teamshudplus.core;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -39,7 +40,7 @@ public class TeamDB extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag compoundTag) {
+    public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider provider) {
         toNBT(compoundTag);
         return compoundTag;
     }
@@ -219,7 +220,11 @@ public class TeamDB extends SavedData {
      */
     static TeamDB get(ServerLevel serverLevel) {
         return serverLevel.getDataStorage()
-                .get(compoundTag -> loadStatic(compoundTag, serverLevel),TEAMS_KEY);
+                .get(new SavedData.Factory<>(
+                        () -> new TeamDB(serverLevel),
+                        (tag, provider) -> loadStatic(tag, provider, serverLevel),
+                        null
+                ), TEAMS_KEY);
     }
 
     /**
@@ -229,7 +234,11 @@ public class TeamDB extends SavedData {
      */
     static TeamDB getOrMake(ServerLevel serverLevel) {
         return serverLevel.getDataStorage()
-                .computeIfAbsent(compoundTag -> loadStatic(compoundTag,serverLevel), () -> new TeamDB(serverLevel), TEAMS_KEY);
+                .computeIfAbsent(new SavedData.Factory<>(
+                        () -> new TeamDB(serverLevel),
+                        (tag, provider) -> loadStatic(tag, provider, serverLevel),
+                        null
+                ), TEAMS_KEY);
     }
 
     /**
@@ -247,7 +256,7 @@ public class TeamDB extends SavedData {
      * @param level The server level
      * @return The loaded TeamDB instance
      */
-    public static TeamDB loadStatic(CompoundTag compoundTag,ServerLevel level) {
+    public static TeamDB loadStatic(CompoundTag compoundTag, HolderLookup.Provider provider, ServerLevel level) {
         TeamDB id = new TeamDB(level);
         id.fromNBT(compoundTag);
         return id;

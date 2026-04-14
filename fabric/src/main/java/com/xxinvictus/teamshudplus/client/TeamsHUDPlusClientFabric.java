@@ -1,12 +1,14 @@
 package com.xxinvictus.teamshudplus.client;
 
+import com.xxinvictus.teamshudplus.TeamsHUDPlus;
 import com.xxinvictus.teamshudplus.client.TeamsHUDPlusClient;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.Minecraft;
 
@@ -19,10 +21,14 @@ public class TeamsHUDPlusClientFabric implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        // Register HUDs
-        HudRenderCallback.EVENT.register((graphics, tickDelta) -> {
-            TeamsHUDPlusClient.status.render(graphics);
-            TeamsHUDPlusClient.compass.render(graphics);
+        // Register HUDs using the layered HUD system
+        HudLayerRegistrationCallback.EVENT.register((layeredDrawer) -> {
+            layeredDrawer.attachLayerAfter(IdentifiedLayer.CROSSHAIR, TeamsHUDPlus.id("status"), (context, tickCounter) -> {
+                TeamsHUDPlusClient.status.render(context);
+            });
+            layeredDrawer.attachLayerAfter(IdentifiedLayer.CROSSHAIR, TeamsHUDPlus.id("compass"), (context, tickCounter) -> {
+                TeamsHUDPlusClient.compass.render(context);
+            });
         });
 
         // Handle keybinds and mouse dragging

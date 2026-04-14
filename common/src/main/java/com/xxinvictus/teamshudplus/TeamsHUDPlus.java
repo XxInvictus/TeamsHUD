@@ -1,6 +1,6 @@
 package com.xxinvictus.teamshudplus;
 
-import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -48,7 +48,7 @@ public class TeamsHUDPlus {
      * @param player The player who earned the advancement
      * @param advancement The advancement earned
      */
-    public static void onAdvancement(ServerPlayer player, Advancement advancement) {
+    public static void onAdvancement(ServerPlayer player, AdvancementHolder advancement) {
         if (!Services.PLATFORM.getConfig().syncAdvancements()) {
             return;
         }
@@ -127,7 +127,7 @@ public class TeamsHUDPlus {
      * @return A ResourceLocation for this mod
      */
     public static ResourceLocation id(String path) {
-        return new ResourceLocation(MODID,path);
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 
     /**

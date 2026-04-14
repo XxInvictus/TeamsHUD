@@ -2,6 +2,7 @@ package com.xxinvictus.teamshudplus.core;
 
 import com.xxinvictus.teamshudplus.TeamsHUDPlus;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
@@ -46,7 +47,7 @@ public class LegacyDataMigration {
                 TeamsHUDPlus.LOGGER.info("Found existing team data at: {}", teamsFile.getAbsolutePath());
                 
                 try {
-                    CompoundTag nbt = NbtIo.readCompressed(teamsFile);
+                    CompoundTag nbt = NbtIo.readCompressed(teamsFile.toPath(), NbtAccounter.unlimitedHeap());
                     if (nbt != null && nbt.contains("teams")) {
                         int teamCount = nbt.getList("teams", 10).size();
                         TeamsHUDPlus.LOGGER.info("Team data contains {} team(s). Data will be loaded automatically.", teamCount);
@@ -87,10 +88,10 @@ public class LegacyDataMigration {
             String lastModified = new java.util.Date(teamsFile.lastModified()).toString();
             
             try {
-                CompoundTag nbt = NbtIo.readCompressed(teamsFile);
+                CompoundTag nbt = NbtIo.readCompressed(teamsFile.toPath(), NbtAccounter.unlimitedHeap());
                 if (nbt != null && nbt.contains("teams")) {
                     int teamCount = nbt.getList("teams", 10).size();
-                    return String.format("Team data: %d team(s), %dKB, last modified: %s", 
+                    return String.format("Team data: %d team(s), %dKB, last modified: %s",
                         teamCount, fileSizeKB, lastModified);
                 }
             } catch (IOException e) {
@@ -126,7 +127,7 @@ public class LegacyDataMigration {
                 return null;
             }
             
-            CompoundTag nbt = NbtIo.readCompressed(playerFile);
+            CompoundTag nbt = NbtIo.readCompressed(playerFile.toPath(), NbtAccounter.unlimitedHeap());
             if (nbt.contains("playerTeam")) {
                 String teamName = nbt.getString("playerTeam");
                 TeamsHUDPlus.LOGGER.debug("Player {} is in team: {}", playerUUID, teamName);

@@ -24,6 +24,9 @@ import java.util.List;
 /**
  * Mixin for TeamMsgCommand to fix team messaging with ModTeam instances.
  * Ensures the /teammsg command works correctly with custom team implementations.
+ *
+ * NOTE: This mixin is fragile as it targets a lambda method inside TeamMsgCommand.
+ * The mixin target and injection point may need adjustment when updating MC versions.
  */
 @Mixin(TeamMsgCommand.class)
 public abstract class TeamMessageCommandMixin {
@@ -47,9 +50,8 @@ public abstract class TeamMessageCommandMixin {
         if (team instanceof ModTeam modTeam) {
             List<ServerPlayer> list = commandSource.getServer().getPlayerList().getPlayers().stream().filter((p_288679_) -> p_288679_ == entity || p_288679_.getTeam() == modTeam).toList();
             if (!list.isEmpty()) {
-                MessageArgument.resolveChatMessage(ctx, "message", (p_248180_) -> {
-                    sendMessage(commandSource, entity, modTeam.getScoreboardTeam(), list, p_248180_);
-                });
+                PlayerChatMessage chatMessage = MessageArgument.getChatMessage(ctx, "message");
+                sendMessage(commandSource, entity, modTeam.getScoreboardTeam(), list, chatMessage);
             }
             cir.setReturnValue(list.size());
         }

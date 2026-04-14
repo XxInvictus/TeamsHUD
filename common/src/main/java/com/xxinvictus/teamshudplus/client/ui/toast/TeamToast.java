@@ -1,7 +1,6 @@
 package com.xxinvictus.teamshudplus.client.ui.toast;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.xxinvictus.teamshudplus.platform.MultiloaderConfig;
 import com.xxinvictus.teamshudplus.platform.Services;
 
@@ -9,13 +8,16 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Base class for team-related toast notifications.
  * Displays team messages with a configurable duration.
  */
 public abstract class TeamToast implements Toast {
+
+    private static final ResourceLocation TOAST_TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/toasts.png");
 
     /** The team name */
     public final String team;
@@ -49,9 +51,8 @@ public abstract class TeamToast implements Toast {
             firstDraw = false;
         }
 
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        graphics.blit(TEXTURE, 0, 0, 0, 64, this.width(), this.height());
+        graphics.blit(RenderType::guiTextured, TOAST_TEXTURE, 0, 0, 0, 64, this.width(), this.height(), 256, 256);
         graphics.drawString(manager.getMinecraft().font, title(), 22, 7, ChatFormatting.WHITE.getColor());
         graphics.drawString(manager.getMinecraft().font, subTitle(), 22, 18, 0xff000000,false);
 

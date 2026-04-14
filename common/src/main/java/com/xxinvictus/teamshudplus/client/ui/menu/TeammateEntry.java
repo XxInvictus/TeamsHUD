@@ -11,9 +11,10 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -28,7 +29,7 @@ public class TeammateEntry extends AbstractWidget {
     static final int HEIGHT = 24;
     private static final ResourceLocation TEXTURE = TeamsHUDPlus.id("textures/gui/screen_background.png");
 
-    private ImageButton kickButton;
+    private Button kickButton;
     private TexturedToggleWidget favButton;
     private final Minecraft client;
     private final ClientTeam.Teammate teammate;
@@ -58,7 +59,7 @@ public class TeammateEntry extends AbstractWidget {
             }, () -> ClientTeam.INSTANCE.isFavourite(teammate));
         }
         if (ClientTeam.INSTANCE.hasPermissions()) {
-            this.kickButton = new ImageButton(x + WIDTH - 24, y + 8, 8, 8, 16, 190, TEXTURE, button -> {
+            this.kickButton = createTexturedButton(x + WIDTH - 24, y + 8, 8, 8, 16, 190, TEXTURE, button -> {
                 Services.PLATFORM.sendToServer(new C2STeamKickPacket(ClientTeam.INSTANCE.getName(), teammate.id));
                 ClientTeam.INSTANCE.removePlayer(teammate.id);
             });
@@ -73,7 +74,7 @@ public class TeammateEntry extends AbstractWidget {
         float scale = 0.5F;
         graphics.pose().pushPose();
         graphics.pose().scale(scale, scale, scale);
-        graphics.blit(teammate.skin, (int) ((x + 4) / scale), (int) ((y + 4) / scale), 32, 32, 32, 32);
+        graphics.blit(RenderType::guiTextured, teammate.skin, (int) ((x + 4) / scale), (int) ((y + 4) / scale), 32, 32, 32, 32, 64, 64);
         graphics.pose().popPose();
         // Nameplate
         graphics.drawString(client.font, teammate.name, x + 24, y + 12 - (client.font.lineHeight / 2), ChatFormatting.BLACK.getColor(),false);
@@ -87,9 +88,8 @@ public class TeammateEntry extends AbstractWidget {
     }
 
     private void renderBackground(GuiGraphics graphics) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        graphics.blit(TEXTURE, x, y, 0, 166, WIDTH, HEIGHT);
+        graphics.blit(RenderType::guiTextured, TEXTURE, x, y, 0, 166, WIDTH, HEIGHT, 256, 256);
     }
 
 
@@ -103,11 +103,20 @@ public class TeammateEntry extends AbstractWidget {
 
     }
 
+    private static Button createTexturedButton(int x, int y, int width, int height, int u, int v, ResourceLocation texture, Button.OnPress onPress) {
+        return new Button(x, y, width, height, Component.empty(), onPress, Button.DEFAULT_NARRATION) {
+            @Override
+            protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+                graphics.blit(RenderType::guiTextured, texture, this.getX(), this.getY(), u, v, this.width, this.height, 256, 256);
+            }
+        };
+    }
+
     /**
      * Gets the kick button widget.
      * @return The kick button
      */
-    public ImageButton getKickButton() {
+    public Button getKickButton() {
         return kickButton;
     }
 

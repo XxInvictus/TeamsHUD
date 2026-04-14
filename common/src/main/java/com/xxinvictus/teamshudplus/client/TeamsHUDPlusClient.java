@@ -1,7 +1,7 @@
 package com.xxinvictus.teamshudplus.client;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.minecraft.MinecraftProfileTexture;
+import net.minecraft.client.resources.PlayerSkin;
 import com.mojang.authlib.properties.Property;
 import com.xxinvictus.teamshudplus.ScreenDuck;
 import com.xxinvictus.teamshudplus.TeamsHUDPlus;
@@ -22,7 +22,10 @@ import com.xxinvictus.teamshudplus.network.client.S2CTeamUpdatePacket;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.network.chat.Component;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.resources.DefaultPlayerSkin;
@@ -82,14 +85,19 @@ public class TeamsHUDPlusClient {
     public static void afterScreenInit(Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight){
         if (screen instanceof InventoryScreen inventoryScreen && minecraft.gameMode != null && !minecraft.gameMode.hasInfiniteItems()) {
             InventoryScreenAccessor screenAccessor = ((InventoryScreenAccessor) screen);
-            ((ScreenDuck)inventoryScreen).$addButton(new ImageButton(screenAccessor.getX() + screenAccessor.getBackgroundWidth() - 19, screenAccessor.getY() + 4, 15, 14, 0, 0, 13, TEAMS_BUTTON_TEXTURE, (button) -> {
+            ((ScreenDuck)inventoryScreen).$addButton(new Button(screenAccessor.getX() + screenAccessor.getBackgroundWidth() - 19, screenAccessor.getY() + 4, 15, 14, Component.empty(), (button) -> {
                 if (ClientTeam.INSTANCE.isInTeam()) {
                     minecraft.setScreen(new TeamsMainScreen(minecraft.screen));
-
                 } else {
                     minecraft.setScreen(new TeamsLonelyScreen(minecraft.screen));
                 }
-            }){
+            }, Button.DEFAULT_NARRATION) {
+                @Override
+                protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+                    int v = this.isHoveredOrFocused() ? 13 : 0;
+                    graphics.blit(RenderType::guiTextured, TEAMS_BUTTON_TEXTURE, this.getX(), this.getY(), 0, v, this.width, this.height, 256, 256);
+                }
+
                 @Override
                 protected boolean clicked(double pMouseX, double pMouseY) {
                     return this.active && this.visible && pMouseX >= (double)this.getX() && pMouseY >= (double)this.getY() && pMouseX < (double)(this.getX() + this.width) && pMouseY < (double)(this.getY() + this.height);
@@ -323,13 +331,11 @@ public class TeamsHUDPlusClient {
                 if (!skinVal.isEmpty()) {
                     GameProfile dummy = new GameProfile(UUID.randomUUID(), "");
                     dummy.getProperties().put("textures", new Property("textures", skinVal, skinSig));
-                    Minecraft.getInstance().getSkinManager().registerSkins(dummy, (textureType, id, texture) -> {
-                        if (textureType == MinecraftProfileTexture.Type.SKIN) {
-                            ClientTeam.INSTANCE.addPlayer(uuid, name, id, health, hunger);
-                        }
-                    }, false);
+                    PlayerSkin skin = Minecraft.getInstance().getSkinManager().getInsecureSkin(dummy);
+                    ClientTeam.INSTANCE.addPlayer(uuid, name, skin.texture(), health, hunger);
                 } else {
-                    ClientTeam.INSTANCE.addPlayer(uuid, name, DefaultPlayerSkin.getDefaultSkin(uuid), health, hunger);
+                    PlayerSkin defaultSkin = DefaultPlayerSkin.get(uuid);
+                    ClientTeam.INSTANCE.addPlayer(uuid, name, defaultSkin.texture(), health, hunger);
                 }
             }
             case UPDATE -> {
